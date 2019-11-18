@@ -7,12 +7,22 @@ using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+//+ Branch() DONE
+//+ Branch(ID: Int) DONE
+//+ add(): String DONE                                   ПРОБЛЕМА С ПРОВЕРКОЙ!
+//+ del(): String DONE
+//+ edit(): String DONE
+//+ getWorkers():List<Worker> 
+//+ getContracts(): List<Contract>
+//+ getCourses(): List<Course>
+//+ getCabinets(): List<Cabinet>
+//+ profit(Start: Datetime, End: Datetime): Double
+//+ revenue(Start: Datetime, End: Datetime): Double
+
 namespace Test
 {
     public class Branch
     {
-
-        [Key]
         public int ID { get; set; }
         public String Name { get; set; }
         public String Address { get; set; }
@@ -20,11 +30,101 @@ namespace Test
         public Nullable<System.DateTime> Editdate { get; set; }
         //[Required]
         public /*Worker*/  int DirectorBranch { get; set; }
+
+
+        public ICollection<Contract> Contracts { get; set; }
+
+        public Branch()
+        { }
+
+        public string Add()
+        {
+            string answer = Сheck(this);
+            if (answer == "Данные корректны!")
+            {
+                using (SampleContext context = new SampleContext())
+                {
+                    context.Branches.Add(this);
+                    context.SaveChanges();
+                    answer = "Добавление филиала прошло успешно";
+                }
+                return answer;
+            }
+            return answer;
+        }
+
+        public string Del()
+        {
+            string o;
+            using (SampleContext context = new SampleContext())
+            {
+                this.Deldate = DateTime.Now;
+                context.Entry(this).State = EntityState.Modified;
+                context.SaveChanges();
+                o = "Удаление филиала прошло успешно";
+            }
+            return o;
+        }
+
+        public string Edit()
+        {
+            string answer = Сheck(this);
+            if (answer == "Данные корректны!")
+            {
+                using (SampleContext context = new SampleContext())
+                {
+                    this.Editdate = DateTime.Now;
+                    context.Entry(this).State = EntityState.Modified;
+                    context.SaveChanges();
+                    answer = "Редактирование филиала прошло успешно";
+                }
+                return answer;
+            }
+            return answer;
+        }
+
+        public string Сheck(Branch st)           // Перепроверить проверку с уже существующими !
+        {
+            if (st.Name == "")
+            { return "Введите название филиала. Это поле не может быть пустым"; }
+            if (st.Address == "")
+            { return "Введите адрес филиала. Это поле не может быть пустым"; }
+            if (st.DirectorBranch == 0)
+            { return "Выберите начальника филиала. Это поле не может быть пустым"; }
+            using (SampleContext context = new SampleContext())
+            {
+                Branch v = new Branch();
+                if (st.ID ==0)       // если мы добавляем новый филиал 
+                {
+                    v = context.Branches.Where(x => x.Name == st.Name && x.Address == st.Address && x.DirectorBranch == st.DirectorBranch || x.Address == st.Address || x.DirectorBranch == st.DirectorBranch).FirstOrDefault<Branch>();
+                    if (v != null)
+                    { return "Такой филиал уже существует в базе под номером " + v.ID; }   
+                }
+                else
+                {
+                    v = context.Branches.Where(x => x.Name == st.Name && x.Address == st.Address && x.DirectorBranch == st.DirectorBranch).FirstOrDefault<Branch>();
+                    if (v != null && v != st)
+                    { return "Такой филиал уже существует в базе под номером " + v.ID; }
+                }
+            }
+            return "Данные корректны!";
+        }
+
     }
 
-    public class Branches
+    public static class Branches
     {
-        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех филиалов //////////////////
+        public static Branch BranchID(int id)
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                Branch v = context.Branches.Where(x => x.ID == id).FirstOrDefault<Branch>();
+
+                return v;
+            }
+        }
+
+        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
         public static List<Branch> FindAll(Boolean deldate, Branch branch, Worker director, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Branch> list = new List<Branch>();

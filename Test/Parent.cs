@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
+
+//+ Parent() DONE
+//+ ParentID(ID : Int) DONE
+//+ del(): String DONE
+//+ add(): String DONE
+//+ edit(): String DONE
+//+getStudents(): List<Student> DONE
 
 namespace Test
 {
@@ -15,19 +23,54 @@ namespace Test
         public Nullable<System.DateTime> Editdate { get; set; }
 
         public Parent()
+        { }
+        public string Add()
         {
-        }
-        public Parent ParentID(int id)
-        {
-            using (SampleContext db = new SampleContext())
+            string answer = Сheck(this);
+            if (answer == "Данные корректны!")
             {
-                Parent v = db.Parents.Where(x => x.ID == id).FirstOrDefault<Parent>();
-
-                return v;
+                using (SampleContext context = new SampleContext())
+                {
+                    context.Parents.Add(this);
+                    context.SaveChanges();
+                    answer = "Добавление ответственного лица прошло успешно";
+                }
+                return answer;
             }
+            return answer;
         }
 
-        public static List<Student> GetStudents(int id)   // Получение списка учеников этого родителя
+        public string Del()
+        {
+            string o;
+            using (SampleContext context = new SampleContext())
+            {
+                this.Deldate = DateTime.Now;
+                context.Entry(this).State = EntityState.Modified;
+                context.SaveChanges();
+                o = "Удаление ответственного лица прошло успешно";
+            }
+            return o;
+        }
+
+        public string Edit()
+        {
+            string answer = Сheck(this);
+            if (answer == "Данные корректны!")
+            {
+                using (SampleContext context = new SampleContext())
+                {
+                    this.Editdate = DateTime.Now;
+                    context.Entry(this).State = EntityState.Modified;
+                    context.SaveChanges();
+                    answer = "Редактирование ответственного лица прошло успешно";
+                }
+                return answer;
+            }
+            return answer;
+        }
+
+        public static List<Student> GetStudents(Parent par)   // Получение списка учеников этого родителя
         {
             List<Student> liststudents = new List<Student>();
             using (SampleContext db = new SampleContext())
@@ -37,36 +80,54 @@ namespace Test
                                join s in db.Students on sp.StudentID equals s.ID
                                select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = p.ID, ParID = sp.ParentID, StID = sp.StudentID };
 
-                //             Parent par = ParentID(); запрос на получение текущего родителя (ParentID) будет проходить из формы !!!!!!! 
-                students = students.Where(x => x.ParID == id );
+                students = students.Where(x => x.ParID == par.ID );
                 students = students.Where(x => x.SID == x.StID);
 
                 foreach (var p in students)
                 {
                     liststudents.Add(new Student { ID = p.SID, Phone = p.SPhone, Deldate = p.SDelDate, FIO = p.SFIO });  // Добавление учеников в список
                 }
-
                 return liststudents;
             }
         }
-    }
-        public class Parents
-    {
-        public static List<Parent> GetPa(SampleContext context)
+
+        public string Сheck(Parent st)
         {
-            //      var context = new SampleContext();
-
-            var parents = context.Parents.ToList();
-            return parents;
+            if (st.FIO == "")
+            { return "Введите ФИО ответственного лица. Это поле не может быть пустым"; }
+            if (st.Phone == "")
+            { return "Введите номер телефона ответственного лица. Это поле не может быть пустым"; }
+            using (SampleContext context = new SampleContext())
+            {
+                Student v = new Student();
+                v = context.Students.Where(x => x.FIO == st.FIO && x.Phone == st.Phone).FirstOrDefault<Student>();
+                if (v != null)
+                { return "Такое ответственное лицо уже существует в базе под номером " + v.ID; }
+            }
+            return "Данные корректны!";
         }
+    }
 
+
+
+        public static class Parents
+    {
+        public static Parent ParentID(int id)
+        {
+            using (SampleContext db = new SampleContext())
+            {
+                Parent v = db.Parents.Where(x => x.ID == id).FirstOrDefault<Parent>();
+
+                return v;
+            }
+        }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех родителей //////////////////
         public static List<Parent> FindAll(Boolean deldate,Parent parent, Student student, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Parent> parentList = new List<Parent>();
 
-            using (SampleContext db = new SampleContext())
+            using (SampleContext db = new SampleContext())          
             {
                 // Соединение необходимых таблиц
                 var parents = from p in db.Parents
@@ -128,8 +189,7 @@ namespace Test
                     {
                         parentList.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO }); // Добавление родителя в лист, если такого еще нет, это для предохранения от дубликатов
                     }
-                }
-                          
+                }       
                 return parentList;
             }
         }
