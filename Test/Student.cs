@@ -16,6 +16,8 @@ using System.Data.Entity;
 //+ getCourses(Finished: Bolean): List<Course>
 //+ getTimetable(Start: Datetime, End: Datetime): List<Timetable> 
 //+ getDebt(Contract: Contract): Double
+//+ addParent() DONE - и возможных нужно тоже тут искать (пока не сделано)
+//+ delParent() DONE
 
 
 
@@ -99,6 +101,18 @@ namespace Test
             return "Данные корректны!";
         }
 
+        public static string СheckPar(StudentsParents stpar)
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                StudentsParents v = new StudentsParents();
+                v = context.StudentsParents.Where(x => x.StudentID == stpar.StudentID && x.ParentID == stpar.ParentID).FirstOrDefault<StudentsParents>();
+                if (v != null)
+                { return "Это ответственное лицо уже числится за этим учеником"; }
+            }
+            return "Данные корректны!";
+        }
+
 
         public static List<Contract> GetContracts(Student st)
         {
@@ -128,6 +142,44 @@ namespace Test
                 }
                 return listparents;
             }
+        }
+
+        public static string addParent(Parent par, Student st)
+        {
+            StudentsParents stpar = new StudentsParents();
+            stpar.StudentID = st.ID;
+            stpar.ParentID = par.ID;
+            string answer = СheckPar(stpar);
+            if (answer == "Данные корректны!")
+            {
+                using (SampleContext context = new SampleContext())
+                {
+                    context.StudentsParents.Add(stpar);
+                    context.SaveChanges();
+                    answer = "Добавление отв.лица к ученику прошло успешно";
+                }
+                return answer;
+            }
+            return answer;
+        }
+
+        public static string delParent(Parent par, Student st)
+        {
+            StudentsParents stpar = new StudentsParents();
+            stpar.StudentID = st.ID;
+            stpar.ParentID = par.ID;
+            string answer = "";
+
+                using (SampleContext context = new SampleContext())
+                {
+                    StudentsParents v = new StudentsParents();
+                    v = context.StudentsParents.Where(x => x.StudentID == stpar.StudentID && x.ParentID == stpar.ParentID).FirstOrDefault<StudentsParents>();
+                    context.StudentsParents.Remove(v);
+                    context.SaveChanges();
+
+                    answer = "Удаление отв.лица у ученика прошло успешно";
+                }
+                return answer;
         }
     }
 
@@ -166,11 +218,11 @@ namespace Test
 
 
                 // Соединение необходимых таблиц
-                var query = from s in db.Students
-                            join sp in db.StudentsParents on s.ID equals sp.StudentID
-                            join p in db.Parents on sp.StudentID equals p.ID
-                            join c in db.Contracts on s.ID equals c.StudentID
-                            select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = p.ID, CID = c.ID };
+                //var query = from s in db.Students
+                //            join sp in db.StudentsParents on s.ID equals sp.StudentID
+                //            join p in db.Parents on sp.StudentID equals p.ID
+                //            join c in db.Contracts on s.ID equals c.StudentID
+                //            select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = p.ID, CID = c.ID };
 
                 //IQueryable<Student> query = from s in db.Students
                 //             join sp in db.StudentsParents
@@ -213,6 +265,20 @@ namespace Test
 
 
 
+                var query =   from s in db.Students
+                            join sp in db.StudentsParents on s.ID equals sp.StudentID
+                            into std_prnt_temp
+                            from std_prnt in std_prnt_temp.DefaultIfEmpty()
+                            join p in db.Parents on std_prnt.StudentID equals p.ID
+                            into prnt_temp
+                            from prnt in prnt_temp.DefaultIfEmpty()
+                            join c in db.Contracts on s.ID equals c.StudentID
+                            into cntr_temp
+                            from cntr in cntr_temp.DefaultIfEmpty()
+                            select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID) };
+
+
+
                 // Последовательно просеиваем наш список
 
                 if (deldate != false) // Убираем удаленных, если нужно
@@ -239,6 +305,8 @@ namespace Test
                 {
                     query = query.Where(x => x.CID == contracnt.ID);
                 }
+
+                query = query.Distinct();
 
                 if (sort != null)  // Сортировка, если нужно
                 {

@@ -47,7 +47,7 @@ namespace Test
                 {
                     context.Workers.Add(this);
                     context.SaveChanges();
-                    answer = "Добавление филиала прошло успешно";
+                    answer = "Добавление договора прошло успешно";
                 }
                 return answer;
             }
@@ -62,7 +62,7 @@ namespace Test
                 this.Deldate = DateTime.Now;
                 context.Entry(this).State = EntityState.Modified;
                 context.SaveChanges();
-                o = "Удаление филиала прошло успешно";
+                o = "Удаление договора прошло успешно";
             }
             return o;
         }
@@ -77,7 +77,7 @@ namespace Test
                     this.Editdate = DateTime.Now;
                     context.Entry(this).State = EntityState.Modified;
                     context.SaveChanges();
-                    answer = "Редактирование филиала прошло успешно";
+                    answer = "Редактирование договора прошло успешно";
                 }
                 return answer;
             }

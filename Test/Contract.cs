@@ -36,6 +36,9 @@ namespace Test
         public int StudentID { get; set; }
         public Student Student { get; set; }
 
+        public int CourseID { get; set; }
+        public Course Course { get; set; }
+
         public int ManagerID { get; set; }
         public Worker Manager { get; set; }
 
@@ -55,9 +58,14 @@ namespace Test
             {
                 using (SampleContext context = new SampleContext())
                 {
+                    StudentsCourses stpar = new StudentsCourses();
+                    stpar.StudentID = this.StudentID;
+                    stpar.CourseID = this.CourseID;
                     context.Contracts.Add(this);
+                    context.StudentsCourses.Add(stpar);
                     context.SaveChanges();
-                    answer = "Добавление филиала прошло успешно";
+
+                    answer = "Добавление договора прошло успешно";
                 }
                 return answer;
             }
@@ -72,7 +80,7 @@ namespace Test
                 this.Deldate = DateTime.Now;
                 context.Entry(this).State = EntityState.Modified;
                 context.SaveChanges();
-                o = "Удаление филиала прошло успешно";
+                o = "Удаление договора прошло успешно";
             }
             return o;
         }
@@ -87,7 +95,7 @@ namespace Test
                     this.Editdate = DateTime.Now;
                     context.Entry(this).State = EntityState.Modified;
                     context.SaveChanges();
-                    answer = "Редактирование филиала прошло успешно";
+                    answer = "Редактирование договора прошло успешно";
                 }
                 return answer;
             }

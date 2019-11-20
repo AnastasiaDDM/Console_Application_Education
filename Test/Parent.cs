@@ -11,6 +11,8 @@ using System.Data.Entity;
 //+ add(): String DONE
 //+ edit(): String DONE
 //+getStudents(): List<Student> DONE
+//+ addStudent() DONE
+//+ delStudent() DONE
 
 namespace Test
 {
@@ -80,6 +82,7 @@ namespace Test
                                join s in db.Students on sp.StudentID equals s.ID
                                select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = p.ID, ParID = sp.ParentID, StID = sp.StudentID };
 
+
                 students = students.Where(x => x.ParID == par.ID );
                 students = students.Where(x => x.SID == x.StID);
 
@@ -105,6 +108,56 @@ namespace Test
                 { return "Такое ответственное лицо уже существует в базе под номером " + v.ID; }
             }
             return "Данные корректны!";
+        }
+
+        public static string СheckSt(StudentsParents stpar)
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                StudentsParents v = new StudentsParents();
+                v = context.StudentsParents.Where(x => x.StudentID == stpar.StudentID && x.ParentID == stpar.ParentID).FirstOrDefault<StudentsParents>();
+                if (v != null)
+                { return "Этот ученик уже числится за этим отв. лицом"; }
+            }
+            return "Данные корректны!";
+        }
+
+        public static string addStudent(Parent par, Student st)
+        {
+            StudentsParents stpar = new StudentsParents();
+            stpar.StudentID = st.ID;
+            stpar.ParentID = par.ID;
+            string answer = СheckSt(stpar);
+            if (answer == "Данные корректны!")
+            {
+                using (SampleContext context = new SampleContext())
+                {
+                    context.StudentsParents.Add(stpar);
+                    context.SaveChanges();
+                    answer = "Добавление ученика к отв. лицу прошло успешно";
+                }
+                return answer;
+            }
+            return answer;
+        }
+
+        public static string delStudent(Parent par, Student st)
+        {
+            StudentsParents stpar = new StudentsParents();
+            stpar.StudentID = st.ID;
+            stpar.ParentID = par.ID;
+            string answer = "";
+
+            using (SampleContext context = new SampleContext())
+            {
+                StudentsParents v = new StudentsParents();
+                v = context.StudentsParents.Where(x => x.StudentID == stpar.StudentID && x.ParentID == stpar.ParentID).FirstOrDefault<StudentsParents>();
+                context.StudentsParents.Remove(v);
+                context.SaveChanges();
+
+                answer = "Удаление ученика у отв. лица прошло успешно";
+            }
+            return answer;
         }
     }
 

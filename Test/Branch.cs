@@ -12,10 +12,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 //+ add(): String DONE                                   ПРОБЛЕМА С ПРОВЕРКОЙ!
 //+ del(): String DONE
 //+ edit(): String DONE
-//+ getWorkers():List<Worker> 
-//+ getContracts(): List<Contract>
+//+ getWorkers():List<Worker> DONE
+//+ getContracts(): List<Contract> DONE
 //+ getCourses(): List<Course>
-//+ getCabinets(): List<Cabinet>
+//+ getCabinets(): List<Cabinet> DONE
 //+ profit(Start: Datetime, End: Datetime): Double
 //+ revenue(Start: Datetime, End: Datetime): Double
 
@@ -33,9 +33,14 @@ namespace Test
 
 
         public ICollection<Contract> Contracts { get; set; }
+        public ICollection<Cabinet> Cabinets { get; set; }
+
 
         public Branch()
-        { }
+        {
+            Contracts = new List<Contract>();
+            Cabinets = new List<Cabinet>();
+        }
 
         public string Add()
         {
@@ -110,6 +115,32 @@ namespace Test
             return "Данные корректны!";
         }
 
+        public static List<Cabinet> GetCabinets(Branch st) // можно вводить только существующий ID филиала
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                var v = context.Cabinets.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Cabinet>();
+                return v;
+            }
+        }
+
+        public static List<Contract> GetContracts(Branch st) // можно вводить только существующий ID филиала
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                var v = context.Contracts.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Contract>();
+                return v;
+            }
+        }
+
+        public static List<Worker> GetWorkers(Branch st) // можно вводить только существующий ID филиала
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                var v = context.Workers.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Worker>();
+                return v;
+            }
+        }
     }
 
     public static class Branches
