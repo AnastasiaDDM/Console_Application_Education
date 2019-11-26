@@ -14,7 +14,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 //+ edit(): String DONE
 //+ getWorkers():List<Worker> DONE
 //+ getContracts(): List<Contract> DONE
-//+ getCourses(): List<Course>
+//+ getCourses(): List<Course> DONE
 //+ getCabinets(): List<Cabinet> DONE
 //+ profit(Start: Datetime, End: Datetime): Double
 //+ revenue(Start: Datetime, End: Datetime): Double
@@ -138,6 +138,15 @@ namespace Test
             using (SampleContext context = new SampleContext())
             {
                 var v = context.Workers.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Worker>();
+                return v;
+            }
+        }
+
+        public static List<Course> GetCourses(Branch st) // можно вводить только существующий ID филиала
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                var v = context.Courses.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Course>();
                 return v;
             }
         }

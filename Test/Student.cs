@@ -13,7 +13,7 @@ using System.Data.Entity;
 //+ edit(): String DONE
 //+ getParents(): List<Parent> DONE
 //+ getContracts(): List<Contract> DONE
-//+ getCourses(Finished: Bolean): List<Course>
+//+ getCourses(Finished: Bolean): List<Course> DONE
 //+ getTimetable(Start: Datetime, End: Datetime): List<Timetable> 
 //+ getDebt(Contract: Contract): Double
 //+ addParent() DONE - и возможных нужно тоже тут искать (пока не сделано)
@@ -124,6 +124,26 @@ namespace Test
             }
         }
 
+        public static List<Course> GetCourses(Student s)    // Получение списка курсов этого ученика
+        {
+            List<Course> listcourses = new List<Course>();
+            using (SampleContext db = new SampleContext())
+            {
+                var query = from c in db.Courses
+                            join sc in db.StudentsCourses on c.ID equals sc.CourseID
+                            select new { ID = c.ID, nameGroup = c.nameGroup, Cost = c.Cost, TypeID = c.TypeID, BranchID = c.BranchID, Start = c.Start, End = c.End, EditDate = c.Editdate, DelDate = c.Deldate, CourID = sc.CourseID, StID = sc.StudentID };
+
+                query = query.Where(x => x.StID == s.ID);
+                query = query.Where(x => x.ID == x.CourID);
+
+                foreach (var c in query)
+                {
+                    listcourses.Add(new Course { ID = c.ID, nameGroup = c.nameGroup, Cost = c.Cost, TypeID = c.TypeID, BranchID = c.BranchID, Start = c.Start, End = c.End, Editdate = c.EditDate, Deldate = c.DelDate });
+                }
+                return listcourses;
+            }
+        }
+
         public static List<Parent> GetParents(Student s)    // Получение списка родителей этого ученика
         {
             List<Parent> listparents = new List<Parent>();
@@ -207,7 +227,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех учеников //////////////////
-        public static List<Student> FindAll(Boolean deldate, Parent parent, Student student, Contract contracnt, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Student> FindAll(Boolean deldate, Parent parent, Student student, Contract contracnt, Course course, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Student> stList = new List<Student>();
 
@@ -275,7 +295,10 @@ namespace Test
                             join c in db.Contracts on s.ID equals c.StudentID
                             into cntr_temp
                             from cntr in cntr_temp.DefaultIfEmpty()
-                            select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID) };
+                            join scour in db.StudentsCourses on s.ID equals scour.StudentID
+                            into std_cour_temp
+                            from stcour in std_cour_temp.DefaultIfEmpty()
+                              select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
 
 
 
@@ -284,11 +307,6 @@ namespace Test
                 if (deldate != false) // Убираем удаленных, если нужно
                 {
                     query = query.Where(x => x.SDelDate == null);
-                }
-
-                if (parent.ID != 0)
-                {
-                    query = query.Where(x => x.PID == parent.ID);
                 }
 
                 if (student.FIO != null)
@@ -301,9 +319,19 @@ namespace Test
                     query = query.Where(x => x.SPhone == student.Phone);
                 }
 
+                if (parent.ID != 0)
+                {
+                    query = query.Where(x => x.PID == parent.ID);
+                }
+
                 if (contracnt.ID != 0)
                 {
                     query = query.Where(x => x.CID == contracnt.ID);
+                }
+
+                if (course.ID != 0)
+                {
+                    query = query.Where(x => x.CourseID == course.ID);
                 }
 
                 query = query.Distinct();

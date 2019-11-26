@@ -72,12 +72,15 @@
     <Compile Include="Parent.cs" />
     <Compile Include="Parentold.cs" />
     <Compile Include="Parent1.cs" />
+    <Compile Include="Pay.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Student.cs" />
     <Compile Include="StudentsCourses.cs" />
     <Compile Include="StudentsParents.cs" />
     <Compile Include="TeachersCourses.cs" />
+    <Compile Include="Timetable.cs" />
+    <Compile Include="TimetablesTeachers.cs" />
     <Compile Include="Type.cs" />
     <Compile Include="Worker.cs" />
   </ItemGroup>

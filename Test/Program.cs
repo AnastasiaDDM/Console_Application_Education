@@ -23,11 +23,14 @@ namespace Test
         public DbSet<StudentsParents> StudentsParents { get; set; }
         public DbSet<StudentsCourses> StudentsCourses { get; set; }
         public DbSet<TeachersCourses> TeachersCourses { get; set; }
+        public DbSet<TimetablesTeachers> TimetablesTeachers { get; set; }
 
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Cabinet> Cabinets { get; set; }
         public DbSet<Type> Types { get; set; }
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Pay> Pays { get; set; }
+        public DbSet<Timetable> Timetables { get; set; }
     }
     class Program
     {
@@ -45,7 +48,7 @@ namespace Test
             String askdesk = "ask";
 
         begin:;
-            Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 - ученики , 2 - родители, 3 - филиалы, 4 -договоры, 5 - работники, 6 - кабинеты, 7 - тип курса, 8 - курсы");
+            Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 - ученики , 2 - родители, 3 - филиалы, 4 -договоры, 5 - работники, 6 - кабинеты, 7 - тип курса, 8 - курсы, 9 - оплаты, 10 - расписание");
             int ch = Convert.ToInt32(Console.ReadLine());
 
             if (ch == 1)                     ////////////////////////////////////////////////  УЧЕНИКИ ////////////////////////////////////////////////////////////////////////////
@@ -61,6 +64,7 @@ namespace Test
                 Console.WriteLine("8 - Список договоров этого ученика");
                 Console.WriteLine("9 - Добавление ученику ответственное лицо");
                 Console.WriteLine("10 - Удаление у ученика ответственного лица");
+                Console.WriteLine("11 - Список курсов этого ученика");
                 int choice = Convert.ToInt32(Console.ReadLine());
 
                 if (choice == 1)
@@ -74,9 +78,11 @@ namespace Test
                     //student.FIO = "Анохин Александр";
                     //student.Phone = "1111111111";
                     Contract contract = new Contract();
+                    Course course = new Course();
+   //                 course.ID = 1;
 
                     List<Student> stud = new List<Student>();
-                    stud = Students.FindAll(deldate, parent, student, contract, sort, askdesk, page, count);
+                    stud = Students.FindAll(deldate, parent, student, contract, course, sort, askdesk, page, count);
 
                     foreach (var s in stud)
                     {
@@ -213,6 +219,18 @@ namespace Test
 
                     string Answ = Student.delParent(p, s);
                     Console.WriteLine(Answ);
+                }
+
+                if (choice == 11)     //Запрос ищет курсы по студенту           
+                {
+                    Console.WriteLine("Введите ID ученика");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student st = Students.StudentID(id);
+                    var v = Student.GetCourses(st);
+                    foreach (var c in v)
+                    {
+                        Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4}  \t Start: {5} ", c.ID, c.nameGroup, c.Cost, c.TypeID, c.BranchID, c.Start);
+                    }
                 }
             }
 
@@ -485,7 +503,18 @@ namespace Test
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1} \t Type: {2} \t Position:{3} \t BranchID: {4} \t Editdate: {5}  \t Deldate:  {6}", s.ID, s.FIO, s.Type, s.Position, s.BranchID, s.Editdate, s.Deldate);
                     }
+                }
 
+                if (choice3 == 8)
+                {
+                    Console.WriteLine("Введите ID филиала");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Branch st = Branches.BranchID(id);
+                    var courses = Branch.GetCourses(st);
+                    foreach (var s in courses)
+                    {
+                        Console.WriteLine("ID: {0} \t Start: {1}  \t nameGroup: {2} \t  Type: {3} \t BranchID: {4} \t Deldate: {5}", s.ID, s.Start, s.nameGroup, s.Type, s.BranchID, s.Deldate);
+                    }
                 }
             }
 
@@ -499,6 +528,7 @@ namespace Test
                 Console.WriteLine("3 - Удаление договора");
                 Console.WriteLine("4 - Редактирование данных о договоре");
                 Console.WriteLine("5 - Расторжение договора");
+                Console.WriteLine("6 - Добавление оплаты");
 
                 //Console.WriteLine("6 - Просмотр неудаленных договоров в виде отсортированного списка в порядке алфавита");
                 //Console.WriteLine("7 - Просмотр отсортированного списка договоров по алфавиту");
@@ -506,7 +536,18 @@ namespace Test
 
                 if (choice4 == 1)
                 {
-                    List<Contract> contracts = Contracts.GetCo();
+                     Branch branch = new Branch();
+                           //branch.ID = 1;
+                    Worker manager = new Worker();
+                    //manager.ID = 5;
+                    Student student = new Student();
+                    Course course = new Course();
+                    DateTime mindate = DateTime.MinValue;
+                    DateTime maxdate = DateTime.MaxValue;
+                    int min = 0;
+                    int max = 0;
+                    List<Contract> contracts = new List<Contract>();
+                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, askdesk, page, count);
 
                     foreach (var s in contracts)
                     {
@@ -613,6 +654,41 @@ namespace Test
                     Console.WriteLine(a);
                 }
 
+                if (choice4 == 6)
+                {
+                    Console.WriteLine("Добавление оплаты:");
+                    Pay p = new Pay();
+                    Console.WriteLine("Введите ID Договора");
+                    int idc = Convert.ToInt32(Console.ReadLine());
+                    Contract co = new Contract();
+                    co = Contracts.ContractID(idc);
+                    p.ContractID = co.ID;
+                    p.Indicator = 1;
+
+
+                    Console.WriteLine("Введите размер оплаты");
+                    double payment = Convert.ToDouble(Console.ReadLine());
+                    p.Payment = payment;
+
+                    Console.WriteLine("Введите тип оплаты");
+                    string p2 = Console.ReadLine();
+                    if (p2 != "")
+                    {
+                        p.Type = p2;
+                    }
+
+                    Console.WriteLine("Введите назначение оплаты");
+                    string p3 = Console.ReadLine();
+                    if (p3 != "")
+                    {
+                        p.Purpose = p3;
+                    }
+
+                    p.Date = DateTime.Now;
+
+                    string answer1 = Contract.addPay(co, p);
+                    Console.WriteLine(answer1);
+                }
 
 
                 //if (choice4 == 6)
@@ -908,13 +984,12 @@ namespace Test
                 Console.WriteLine("2 - Добавление нового типа курса");
                 Console.WriteLine("3 - Удаление типа курса");
                 Console.WriteLine("4 - Редактирование данных о типе курса");
+                Console.WriteLine("5 - Спосок курсов с заданными типом курса");
 
                 int choice = Convert.ToInt32(Console.ReadLine());
 
                 if (choice == 1)
                 {
-                  
-                
                     Type type = new Type();
                     int minLes = 0;
                     int maxLes = 0;
@@ -994,8 +1069,6 @@ namespace Test
 
                 if (choice == 4)
                 {
-                    using (SampleContext context = new SampleContext())
-                    {
                         Console.WriteLine("Редактирование типа курса:");
                         Console.WriteLine("Введите ID");
                         int id = Convert.ToInt32(Console.ReadLine());
@@ -1038,6 +1111,17 @@ namespace Test
                         }
                         string Answer = st.Edit();
                         Console.WriteLine(Answer);
+                }
+
+                if (choice == 5)     //Запрос ищет курсы           
+                {
+                    Console.WriteLine("Введите ID типа курса");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Type st = Types.TypeID(id);
+                    var v = Type.GetCourses(st);
+                    foreach (var c in v)
+                    {
+                        Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4}  \t Start: {5} ", c.ID, c.nameGroup, c.Cost, c.TypeID, c.BranchID, c.Start);
                     }
                 }
             }
@@ -1056,101 +1140,105 @@ namespace Test
 
                 if (choice4 == 1)
                 {
-                    List<Contract> contracts = Contracts.GetCo();
+                    Branch branch = new Branch();
+  //                  branch.ID = 1;
+                    Worker teacher = new Worker();
+    //                teacher.ID = 2;
+                    Type type = new Type();
+                    Course course = new Course();
+                    DateTime mindate = DateTime.MinValue;
+ //                   DateTime mindate = new DateTime(2019, 10, 04); // год - месяц - день
+                    DateTime maxdate = DateTime.MaxValue;
+                    int min = 0;
+                    int max = 0;
+                    List<Course> courses = new List<Course>();
+                    courses = Courses.FindAll(deldate, course, type, teacher, branch, mindate, maxdate, min, max, sort, askdesk, page, count);
 
-                    foreach (var s in contracts)
+                    foreach (var s in courses)
                     {
-                        Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4} \t ManagerID: {5} \t CourseID: {6}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate, s.ManagerID, s.CourseID);
+                        Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4} \t Start: {5} \t End: {6}", s.ID, s.nameGroup, s.Cost, s.TypeID, s.BranchID, s.Start, s.End);
                     }
                 }
 
                 if (choice4 == 2)
                 {
-                    Console.WriteLine("Добавление договора:");
-                    Console.WriteLine("Введите ID Ученика");
-                    int id = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Добавление курса:");
+                    Course c = new Course();
+                    Console.WriteLine("Введите название");
+                    string name = Console.ReadLine();
+                    c.nameGroup = name;
 
-                    Student stud = new Student();
-                    stud = Students.StudentID(id); //Когда будут совпадать ФИО - вылезет ошибка!
-                                                   //В формах будет проще - там будет выбираться сразу вся строчка ученика, в которой будет ID
-                                                   // Если ввести ФИО, которого нет в бд - будет ошибка! Я не делаю проверку, потому что у меня в проекте
-                                                   // Ученик будет выбираться из предложенных
+                    Console.WriteLine("Введите размер стоимость обучения");
+                    double cost = Convert.ToDouble(Console.ReadLine());
+                    c.Cost = cost;
 
-                    Console.WriteLine("Введите ID курса");
-                    int idс = Convert.ToInt32(Console.ReadLine());
-                    Course cour = new Course();
-                    cour = Courses.CourseID(idс);
-
-                    Console.WriteLine("Введите ID менеджера");
-                    int idm = Convert.ToInt32(Console.ReadLine());
-                    Worker man = new Worker();
-                    man = Workers.WorkerID(idm); //Когда будут совпадать ФИО - вылезет ошибка!
-
+                    Console.WriteLine("Введите ID типа курса");
+                    int idt = Convert.ToInt32(Console.ReadLine());
+                    Type type = new Type();
+                    type = Types.TypeID(idt);
+                    c.TypeID = type.ID;
 
                     Console.WriteLine("Введите ID филиала");
                     int idb = Convert.ToInt32(Console.ReadLine());
                     Branch bra = new Branch();
-                    bra = Branches.BranchID(idb); //Когда будут совпадать ФИО - вылезет ошибка!
+                    bra = Branches.BranchID(idb);
+                    c.BranchID = bra.ID;
 
-                    Console.WriteLine("Введите стоимость обучения");
-                    double cost = Convert.ToDouble(Console.ReadLine());
+                    Console.WriteLine("Введите дату начала обучения");
+                    DateTime start =  Convert.ToDateTime(Console.ReadLine());
 
-                    Console.WriteLine("Введите размер ежемесячной платы");
-                    double pay = Convert.ToDouble(Console.ReadLine());
+                    Console.WriteLine("Введите дату конца обучения");
+                    DateTime end = Convert.ToDateTime(Console.ReadLine());
 
-                    Contract con = new Contract();
-                    con.Date = DateTime.Now;
-                    //           con.Student = stud;
-                    con.StudentID = stud.ID;
-                    con.CourseID = cour.ID;
-                    con.ManagerID = man.ID;
-                    con.BranchID = bra.ID;
-                    con.Cost = cost;
-                    con.PayofMonth = pay;
-                    string answer1 = con.Add();
+                    string answer1 = c.Add();
                     Console.WriteLine(answer1);
                 }
 
                 if (choice4 == 3)
                 {
-                    Console.WriteLine("Удаление договора:");
+                    Console.WriteLine("Удаление курса:");
                     Console.WriteLine("Введите ID");
                     int id = Convert.ToInt32(Console.ReadLine());
-                    Contract v = Contracts.ContractID(id);
+                    Course v = Courses.CourseID(id);
                     string a = v.Del();
                     Console.WriteLine(a);
                 }
 
                 if (choice4 == 4)
                 {
-                    Console.WriteLine("Редактирование договора:");
+                    Console.WriteLine("Редактирование курса:");
                     Console.WriteLine("Введите ID");
                     int id = Convert.ToInt32(Console.ReadLine());
-                    Contract v = Contracts.ContractID(id);
+                    Course c = Courses.CourseID(id);
 
-                    Console.WriteLine("Введите ID ученика");
-                    int ids = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите название");
+                    string name = Console.ReadLine();
+                    c.nameGroup = name;
 
-                    Console.WriteLine("Введите ID курса");
-                    int idcour = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите размер стоимость обучения");
+                    double cost = Convert.ToDouble(Console.ReadLine());
+                    c.Cost = cost;
 
-                    Console.WriteLine("Введите стоимость обучения");
-                    double cos = Convert.ToDouble(Console.ReadLine());
-
-                    Console.WriteLine("Введите ежемесячную плату");
-                    double pay1 = Convert.ToDouble(Console.ReadLine());
+                    Console.WriteLine("Введите ID типа курса");
+                    int idt = Convert.ToInt32(Console.ReadLine());
+                    Type type = new Type();
+                    type = Types.TypeID(idt);
+                    c.TypeID = type.ID;
 
                     Console.WriteLine("Введите ID филиала");
-                    int idbr = Convert.ToInt32(Console.ReadLine());
+                    int idb = Convert.ToInt32(Console.ReadLine());
+                    Branch bra = new Branch();
+                    bra = Branches.BranchID(idb);
+                    c.BranchID = bra.ID;
 
-                    v.StudentID = ids;
-                    v.BranchID = idbr;
-                    v.CourseID = idcour;
-                    v.Cost = cos;
-                    v.PayofMonth = pay1;
+                    Console.WriteLine("Введите дату начала обучения");
+                    DateTime start = Convert.ToDateTime(Console.ReadLine());
 
-                    string a = v.Edit();
-                    Console.WriteLine(a);
+                    Console.WriteLine("Введите дату конца обучения");
+                    DateTime end = Convert.ToDateTime(Console.ReadLine());
+
+                    string answer1 = c.Edit();
+                    Console.WriteLine(answer1);
                 }
 
                 if (choice4 == 5)
@@ -1216,27 +1304,380 @@ namespace Test
             }
 
 
-            ////////////using (SampleContext db = new SampleContext())
-            ////////////{
+            if (ch == 9)                     ////////////////////////////////////////////////  ОПЛАТЫ ////////////////////////////////////////////////////////////////////////////
+            {
+                Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 до 6.");
+                Console.WriteLine("1 - Вывод всех оплат на экран");
+                Console.WriteLine("2 - Добавление новой оплаты");
+                Console.WriteLine("3 - Удаление оплаты");
+                Console.WriteLine("4 - Редактирование данных об оплаты");
+                Console.WriteLine("5 - Просмотр неудаленных учеников в виде отсортированного списка в порядке алфавита");
+                Console.WriteLine("6 - Просмотр отсортированного списка учеников по алфавиту");
+                Console.WriteLine("7 - Список отв. лиц этого ученика");
+                Console.WriteLine("8 - Список договоров этого ученика");
+                Console.WriteLine("9 - Добавление ученику ответственное лицо");
+                Console.WriteLine("10 - Удаление у ученика ответственного лица");
+                Console.WriteLine("11 - Список курсов этого ученика");
+                int choice = Convert.ToInt32(Console.ReadLine());
 
-            ////////////    // вывод 
-            ////////////    foreach (Contract pl in db.Contracts.Include(p => p.Student))
-            ////////////        Console.WriteLine("{0} - {1}", pl.ID, pl.Student != null ? pl.Student.FIO : "");
-            ////////////    Console.WriteLine();
-            ////////////    foreach (Student t in db.Students.Include(t => t.Contracts))
-            ////////////    {
-            ////////////        Console.WriteLine("Ученик: {0} - {1}", t.ID, t.FIO);
-            ////////////        foreach (Contract pl in t.Contracts)
-            ////////////        {
-            ////////////            Console.WriteLine("{0} - {1}", pl.ID, pl.ManagerID);
-            ////////////        }
-            ////////////        Console.WriteLine();
-            ////////////    }
-            ////////////}
+                if (choice == 1)
+                {
+                    Pay pay = new Pay();
+  //                  pay.Indicator = 2;
+                    Contract contract = new Contract();
+                    Worker teacher = new Worker();
+                    int timetable = 0;
+                    Branch branch = new Branch();
+
+                    DateTime mindate = DateTime.MinValue;
+                    //                   DateTime mindate = new DateTime(2019, 10, 04); // год - месяц - день
+                    DateTime maxdate = DateTime.MaxValue;
+                    int min = 0;
+                    int max = 0;
+
+                    List<Pay> stud = new List<Pay>();
+                    stud = Pays.FindAll(deldate, pay, contract, teacher, timetable, branch, mindate, maxdate, min, max, sort, askdesk, page, count);
+
+                    foreach (var s in stud)
+                    {
+                        Console.WriteLine("ID: {0} \t Date: {1} \t Indicator: {2}  \t  Type: {3} \t Payment: {4} \t ContractID: {5} \t WorkerID: {6}", s.ID, s.Date, s.Indicator, s.Type, s.Payment, s.ContractID, s.WorkerID);
+                    }
+                }
+
+                if (choice == 2)
+                {
+                    Console.WriteLine("Добавление оплаты:");
+                    Pay p = new Pay();
+
+                    Console.WriteLine("Выберите значение индикатора- 1(true) - оплата договора, 2(false) - оплата зарплаты преподавателю");
+                    int ind = Convert.ToInt32(Console.ReadLine());
+                    if(ind ==1)
+                    {
+                        p.Indicator = 1;
+                        Console.WriteLine("Введите ID Договора");
+                        string p0 = Console.ReadLine();
+                        if (p0 != "")
+                        {
+                            int idc = Convert.ToInt32(p0);
+                            Contract co = new Contract();
+                            co = Contracts.ContractID(idc);
+                            p.ContractID = co.ID;
+                        }
+                    }
+
+                    //В формах будет проще - там будет выбираться сразу вся строчка контракта или работника, в которой будет ID
+                    // Если ввести ФИО, которого нет в бд - будет ошибка! Я не делаю проверку, потому что у меня в проекте
+                    // Контракт и работник будут выбираться из предложенных
+                    if (ind == 2)
+                    {
+                        p.Indicator = 2;
+                        Console.WriteLine("Введите ID Преподавателя");
+                        string p1 = Console.ReadLine();
+                        if (p1 != "")
+                        {
+                            int idc = Convert.ToInt32(p1);
+                            Worker w = new Worker();
+                            w = Workers.WorkerID(idc);
+                            p.WorkerID = w.ID;
+                        }
+
+                        Console.WriteLine("Введите ID элемента расписания"); // ЗДесь пока ничего не делается!!!!!
+                        int idt = Convert.ToInt32(Console.ReadLine());
+                        string p6 = Console.ReadLine();
+                        if (p6 != "")
+                        {
+                            // здесь должен быть поиск по расписанию! 
+                            //int idc = Convert.ToInt32(p6);
+                            //Worker w = new Worker();
+                            //w = Workers.WorkerID(idw);
+              //              p.TimetableID = w.ID;
+                        }
+                    }
+
+                    Console.WriteLine("Введите размер оплаты");
+                    double payment = Convert.ToDouble(Console.ReadLine());
+                    p.Payment = payment;
+
+                    Console.WriteLine("Введите тип оплаты");
+                    string p2 = Console.ReadLine();
+                    if (p2 != "")
+                    {
+                        p.Type = p2;
+                    }
+
+                    Console.WriteLine("Введите назначение оплаты");
+                    string p3 = Console.ReadLine();
+                    if (p3 != "")
+                    {
+                        p.Purpose = p3;
+                    }
+
+                    p.Date = DateTime.Now;
+
+                    string answer1 = p.Add();
+                    Console.WriteLine(answer1);
+                }
+
+                if (choice == 3)
+                {
+                    Console.WriteLine("Удаление оплаты:");
+                    Console.WriteLine("Введите ID оплаты");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Pay s = new Pay();
+                    s = Pays.PayID(id);
+                    string Answ = s.Del();
+                    Console.WriteLine(Answ);
+                }
+
+                if (choice == 4) //////  НУЖНО ПОДУМАТЬ, А МОЖНО ЛИ ВООБЩЕ РЕДАКТИРОВАТЬ ОПЛАТУ?
+                {
+                    Console.WriteLine("Редактирование оплаты:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student v = new Student();
+                    v = Students.StudentID(id);
+                    Console.WriteLine("Введите ФИО");
+                    string fio = Console.ReadLine();
+                    Console.WriteLine("Введите номер телефона");
+                    string nom = Console.ReadLine();
+                    v.FIO = fio;
+                    v.Phone = nom;
+                    string Answer = v.Edit();
+                    Console.WriteLine(Answer);
+                }
+            }
+
+            if (ch == 10)                     ////////////////////////////////////////////////  РАСПИСАНИЕ ////////////////////////////////////////////////////////////////////////////
+            {
+                Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 до 6.");
+                Console.WriteLine("1 - Вывод всех элементов расписания на экран");
+                Console.WriteLine("2 - Добавление нового элемента расписания");
+                Console.WriteLine("3 - Удаление элемента расписания");
+                Console.WriteLine("4 - Редактирование данных об элементе расписания");
+
+                int choice4 = Convert.ToInt32(Console.ReadLine());
+
+                if (choice4 == 1)
+                {
+                    Branch branch = new Branch();
+                    //branch.ID = 1;
+                    Worker manager = new Worker();
+                    //manager.ID = 5;
+                    Student student = new Student();
+                    Course course = new Course();
+                    DateTime mindate = DateTime.MinValue;
+                    DateTime maxdate = DateTime.MaxValue;
+                    int min = 0;
+                    int max = 0;
+                    List<Contract> contracts = new List<Contract>();
+                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, askdesk, page, count);
+
+                    foreach (var s in contracts)
+                    {
+                        Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4} \t ManagerID: {5} \t CourseID: {6}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate, s.ManagerID, s.CourseID);
+                    }
+                }
+
+                if (choice4 == 2)
+                {
+                    //Ежедневно
+                    //Еженедельно
+                    //Ежемесячно
+                    //Каждый год
+                    //Каждый будний день(пн - пт)
+
+                    Console.WriteLine("Добавление элемента расписания:");
+                    Timetable t = new Timetable();
+
+                    Console.WriteLine("Введите ID курса");
+                    int idb = Convert.ToInt32(Console.ReadLine());
+                    Course course = new Course();
+                    course = Courses.CourseID(idb);
+                    t.CourseID = course.ID;
+
+                    Console.WriteLine("Введите ID кабинета");
+                    int idс = Convert.ToInt32(Console.ReadLine());
+                    Cabinet cab = new Cabinet();
+                    cab = Cabinets.CabinetID(idс);
+                    t.CabinetID = cab.ID;
+
+                    Console.WriteLine("Введите заметку");
+                    string p3 = Console.ReadLine();
+                    if (p3 != "")
+                    {
+                        string Note = p3;
+                        t.Note = Note;
+                    }
+
+                    Console.WriteLine("Введите час начала занятия");
+                    int Shour = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите минуты начала занятия");
+                    int Smin = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите час окончания занятия");
+                    int Ehour = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите минуты окончания занятия");
+                    int Emin = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите день начала повтора");
+                    int Sday = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите месяц начала повтора");
+                    int Smonth = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите год начала повтора");
+                    int Syear = Convert.ToInt32(Console.ReadLine());
+
+                    DateTime Startdate = new DateTime(Syear, Smonth, Sday, Shour, Smin, 0);
+                    DateTime Enddate = new DateTime(Syear, Smonth, Sday, Ehour, Emin, 0);
+                    t.Startlesson = Startdate;
+  //                  Console.WriteLine(t.Startlesson);
+                    t.Endlesson = Enddate;
+  //                  DateTime retDateTime = t.Startlesson.AddDays(1);
+  //                  Console.WriteLine(retDateTime);
+                    Console.WriteLine("Хотите ли вы повторить расписание? Если да - 1, если нет - то можете ничего не вводить ");
+                    string repeat = Console.ReadLine();
+
+                    if(repeat == "1")
+                    {
+                        Console.WriteLine("Введите параметр повторения 1 - Не повторять, 2 - Ежедневно, 3 - Еженедельно, 4 -Ежемесячно, 5 - Каждый год, 6 - Каждый будний день(пн - пт)");
+                        string  period = Console.ReadLine();
+
+                        Console.WriteLine("Введите день окончания повтора");
+                       int Eday = Convert.ToInt32(Console.ReadLine());
+
+                        Console.WriteLine("Введите месяц окончания повтора");
+                        int Emonth = Convert.ToInt32(Console.ReadLine());
+
+                        Console.WriteLine("Введите год окончания повтора");
+                        int Eyear = Convert.ToInt32(Console.ReadLine());
+
+                        DateTime Endrepeat = new DateTime(Eyear, Emonth, Eday, 23, 59, 59);
+
+                        string ans = t.Add(Endrepeat, period, t);
+                        Console.WriteLine(ans);
+
+                    }
+                    else
+                    { 
+                        string ans = t.Add();
+                        Console.WriteLine(ans);
+                    }
+                }
+
+                if (choice4 == 3)
+                {
+                    Console.WriteLine("Удаление элемента расписания:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Contract v = Contracts.ContractID(id);
+                    string a = v.Del();
+                    Console.WriteLine(a);
+                }
+
+                if (choice4 == 4)
+                {
+                    Console.WriteLine("Редактирование элемента расписания:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Contract v = Contracts.ContractID(id);
+
+                    Console.WriteLine("Введите ID ученика");
+                    int ids = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите ID курса");
+                    int idcour = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите стоимость обучения");
+                    double cos = Convert.ToDouble(Console.ReadLine());
+
+                    Console.WriteLine("Введите ежемесячную плату");
+                    double pay1 = Convert.ToDouble(Console.ReadLine());
+
+                    Console.WriteLine("Введите ID филиала");
+                    int idbr = Convert.ToInt32(Console.ReadLine());
+
+                    v.StudentID = ids;
+                    v.BranchID = idbr;
+                    v.CourseID = idcour;
+                    v.Cost = cos;
+                    v.PayofMonth = pay1;
+
+                    string a = v.Edit();
+                    Console.WriteLine(a);
+                }
+
+                if (choice4 == 5)
+                {
+                    Console.WriteLine("Расторжение договора:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Contract v = Contracts.ContractID(id);
+                    string a = v.Cancellation();
+                    Console.WriteLine(a);
+                }
+
+                if (choice4 == 6)
+                {
+                    Console.WriteLine("Добавление оплаты:");
+                    Pay p = new Pay();
+                    Console.WriteLine("Введите ID Договора");
+                    int idc = Convert.ToInt32(Console.ReadLine());
+                    Contract co = new Contract();
+                    co = Contracts.ContractID(idc);
+                    p.ContractID = co.ID;
+                    p.Indicator = 1;
+
+
+                    Console.WriteLine("Введите размер оплаты");
+                    double payment = Convert.ToDouble(Console.ReadLine());
+                    p.Payment = payment;
+
+                    Console.WriteLine("Введите тип оплаты");
+                    string p2 = Console.ReadLine();
+                    if (p2 != "")
+                    {
+                        p.Type = p2;
+                    }
+
+                    Console.WriteLine("Введите назначение оплаты");
+                    string p3 = Console.ReadLine();
+                    if (p3 != "")
+                    {
+                        p.Purpose = p3;
+                    }
+
+                    p.Date = DateTime.Now;
+
+                    string answer1 = Contract.addPay(co, p);
+                    Console.WriteLine(answer1);
+                }
+            }
+
+
+                ////////////using (SampleContext db = new SampleContext())
+                ////////////{
+
+                ////////////    // вывод 
+                ////////////    foreach (Contract pl in db.Contracts.Include(p => p.Student))
+                ////////////        Console.WriteLine("{0} - {1}", pl.ID, pl.Student != null ? pl.Student.FIO : "");
+                ////////////    Console.WriteLine();
+                ////////////    foreach (Student t in db.Students.Include(t => t.Contracts))
+                ////////////    {
+                ////////////        Console.WriteLine("Ученик: {0} - {1}", t.ID, t.FIO);
+                ////////////        foreach (Contract pl in t.Contracts)
+                ////////////        {
+                ////////////            Console.WriteLine("{0} - {1}", pl.ID, pl.ManagerID);
+                ////////////        }
+                ////////////        Console.WriteLine();
+                ////////////    }
+                ////////////}
 
 
 
-            Console.WriteLine("Повторить? Введдите q.");
+                Console.WriteLine("Повторить? Введдите q.");
             string f = Console.ReadLine();
             if (f == "q")
             {

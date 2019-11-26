@@ -10,7 +10,7 @@ using System.Data.Entity;
 //+ add(): String DONE
 //+ del(): String DONE
 //+ edit(): String DONE
-//+ getCourses():List<Course>
+//+ getCourses():List<Course> DONE
 //+ openTemplate(): String
 //+ createTemplate(): String
 
@@ -89,6 +89,15 @@ namespace Test
             //}
             return "Данные корректны!";
         }
+
+        public static List<Course> GetCourses(Type s)    // Получение списка курсов этого ученика
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                var v = context.Courses.Where(x => x.TypeID == s.ID).OrderBy(u => u.ID).ToList<Course>();
+                return v;
+            }
+        }
     }
 
     public static class Types
@@ -120,7 +129,6 @@ namespace Test
                     query = query.Where(x => x.Deldate == null);
                 }
 
-                //            if (cabinet.Number != "")
                 if (type.Name != null)
                 {
                     query = query.Where(x => x.Name == type.Name);

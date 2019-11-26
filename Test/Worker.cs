@@ -32,9 +32,7 @@ namespace Test
         public Nullable<System.DateTime> Deldate { get; set; }
         public Nullable<System.DateTime> Editdate { get; set; }
 
-
         public ICollection<Contract> Contracts { get; set; }
-
 
         public Worker()
         { }
@@ -110,6 +108,7 @@ namespace Test
             }
         }
     }
+
     public static class Workers
     {
         public static Worker WorkerID(int id)
@@ -121,7 +120,6 @@ namespace Test
                 return v;
             }
         }
-
 
         public static List<Worker> GetWo(SampleContext context)
         {
