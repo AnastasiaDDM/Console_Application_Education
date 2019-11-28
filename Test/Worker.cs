@@ -184,6 +184,19 @@ namespace Test
                 }
                 else { query = query.OrderBy(u => u.ID); }
 
+
+                int countrecord = 0;
+
+                List<int> stid = new List<int>();
+                foreach (var p in query)
+                {
+                    if (stid.Find(x => x == p.ID) == 0)
+                    {
+                        stid.Add(p.ID);
+                        ++countrecord;
+                    }
+                }
+
                 query = query.Skip((page - 1) * count).Take(count);
 
                 foreach (var p in query)

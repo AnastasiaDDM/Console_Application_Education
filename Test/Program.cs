@@ -41,7 +41,7 @@ namespace Test
 
             /////////////////////// ОБЪЯВЛЕНИЕ ОБЩИХ ПЕРЕМЕННЫХ - ДЛЯ УДОБСТВА ПРОВЕРКИ РАБОТЫ ПОИСКОВ ////////////////////////
 
-            Boolean deldate = false; // true - неудален false - все!!!
+            Boolean deldate = true; // true - неудален false - все!!!
             int count = 10;
             int page = 1;
             String sort = "";
@@ -1135,6 +1135,8 @@ namespace Test
                 Console.WriteLine("4 - Редактирование данных о курсе");
                 Console.WriteLine("5 - Список учеников этого курса");
                 Console.WriteLine("6 - Список преподавателей этого курса");
+                Console.WriteLine("7 - Добавление преподавателя на курс");
+                Console.WriteLine("8 - Удаление преподавателя с курса");
 
                 int choice4 = Convert.ToInt32(Console.ReadLine());
 
@@ -1184,11 +1186,17 @@ namespace Test
                     bra = Branches.BranchID(idb);
                     c.BranchID = bra.ID;
 
-                    Console.WriteLine("Введите дату начала обучения");
-                    DateTime start =  Convert.ToDateTime(Console.ReadLine());
+                    Console.WriteLine("Введите дату начала обучения в формате ДД.ММ.ГГГГ");
+                    string start = Console.ReadLine();
+                    string[] w = start.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    DateTime start1 =  new DateTime(Convert.ToInt32(w[2]), Convert.ToInt32(w[1]), Convert.ToInt32(w[0]), 0, 0, 0);
+                    c.Start = start1;
 
-                    Console.WriteLine("Введите дату конца обучения");
-                    DateTime end = Convert.ToDateTime(Console.ReadLine());
+                    Console.WriteLine("Введите дату конца обучения в формате ДД.ММ.ГГГГ");
+                    string end = Console.ReadLine();
+                    string[] w2 = end.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    DateTime end1 = new DateTime(Convert.ToInt32(w2[2]), Convert.ToInt32(w2[1]), Convert.ToInt32(w2[0]), 0, 0, 0);
+                    c.End = end1;
 
                     string answer1 = c.Add();
                     Console.WriteLine(answer1);
@@ -1326,7 +1334,7 @@ namespace Test
   //                  pay.Indicator = 2;
                     Contract contract = new Contract();
                     Worker teacher = new Worker();
-                    int timetable = 0;
+                    Timetable timetable = new Timetable();
                     Branch branch = new Branch();
 
                     DateTime mindate = DateTime.MinValue;
@@ -1362,6 +1370,7 @@ namespace Test
                             Contract co = new Contract();
                             co = Contracts.ContractID(idc);
                             p.ContractID = co.ID;
+                            p.BranchID = co.BranchID;
                         }
                     }
 
@@ -1382,15 +1391,17 @@ namespace Test
                         }
 
                         Console.WriteLine("Введите ID элемента расписания"); // ЗДесь пока ничего не делается!!!!!
-                        int idt = Convert.ToInt32(Console.ReadLine());
                         string p6 = Console.ReadLine();
                         if (p6 != "")
                         {
-                            // здесь должен быть поиск по расписанию! 
-                            //int idc = Convert.ToInt32(p6);
-                            //Worker w = new Worker();
-                            //w = Workers.WorkerID(idw);
-              //              p.TimetableID = w.ID;
+                            int idt = Convert.ToInt32(p6);
+
+                            Timetable w = new Timetable();
+                            w = Timetables.TimetableID(idt);
+                            p.TimetableID = w.ID;
+
+                            Cabinet cab = Cabinets.CabinetID(w.CabinetID);
+                            p.BranchID = cab.BranchID;
                         }
                     }
 

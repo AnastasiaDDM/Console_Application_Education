@@ -27,7 +27,7 @@ namespace Test
         public Worker Worker { get; set; }
 
         public Nullable<int> TimetableID { get; set; }
-        //       public Timetable Timetable { get; set; }
+        public Timetable Timetable { get; set; }
 
         public Nullable<int> BranchID { get; set; }
         public Branch Branch { get; set; }
@@ -111,7 +111,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Pay> FindAll(Boolean deldate, Pay pay, Contract contract, Worker teacher, int timetable, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Pay> FindAll(Boolean deldate, Pay pay, Contract contract, Worker teacher, Timetable timetable, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Pay> list = new List<Pay>();
             using (SampleContext db = new SampleContext())
@@ -157,9 +157,9 @@ namespace Test
                     query = query.Where(x => x.WorkerID == teacher.ID);
                 }
 
-                if (timetable != 0)
+                if (timetable.ID != 0)
                 {
-                    query = query.Where(x => x.TimetableID == timetable);
+                    query = query.Where(x => x.TimetableID == timetable.ID);
                 }
 
                 if (mindate != DateTime.MinValue)

@@ -8,6 +8,8 @@ using System.Data.Entity;
 //+ edit(): String
 //+ add(): String
 //+ del(): String
+//+ addTeachers(): String DONE
+//+ delTeachers(): String DONE
 //+ findAll(Start: Datetime, End: Datetime, editDate:	DateTime, delDate:	DateTime, Course: Course, Cabinet: Cabinet, Teacher: Worker): List<Timetable> 
 
 namespace Test
@@ -38,20 +40,16 @@ namespace Test
                     context.SaveChanges();
                     answer = "Добавление элемента расписания прошло успешно";
                 }
-                return answer;
             }
             return answer;
         }
 
         public string Add(DateTime Endrepeat, string period, Timetable timetable)
         {
-  //          Timetable timetable = new Timetable();
-  //          timetable = this;
             string answer = Сheck(this);
             if (answer == "Данные корректны!")
             {
                 List<Timetable> listtimetable = new List<Timetable>();
- //               listtimetable.Add(timetable);
 
                 //Ежедневно
                 //Еженедельно
@@ -59,89 +57,89 @@ namespace Test
                 //Каждый год
                 //Каждый будний день(пн - пт)
 
-                DateTime newstart = timetable.Startlesson;
-                DateTime newend = timetable.Startlesson;
+                DateTime newstart = timetable.Startlesson; // Присваиваем дате начала занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
+                DateTime newend = timetable.Endlesson; // Присваиваем дате окончания занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
 
-                while (newend <= Endrepeat)
+                while (newend <= Endrepeat) // Организуем цикл для перебора всех дат в заданном диапазоне, т.е. до Endrepeat
                 {
-
                     using (SampleContext context = new SampleContext())
                     {
                         Timetable v = context.Timetables.Where(x => x.Startlesson == newstart).FirstOrDefault<Timetable>();
-                        if (v == null)
+
+                        // В первом проходе добавляется или не добавляется начальная дата, а дальше уже происходит увеличение дат
+                        if (v == null & (period != "Каждый будний день(пн - пт)")) // Добавление для всех вариантов, кроме будних дней, т.к. не нужно учитывать выходные!
                         {
-                            Timetable newtimetable = new Timetable();
-                            newtimetable.CabinetID = timetable.CabinetID;
-                            newtimetable.CourseID = timetable.CourseID;
-                            newtimetable.Note = timetable.Note;
-                            newtimetable.Startlesson = newstart;
-                            newtimetable.Endlesson = newend;
-                            listtimetable.Add(newtimetable);
+                            Timetable newtimetable = new Timetable(); // Создаем новый экземпляр класса
+                            newtimetable.CabinetID = timetable.CabinetID; // Добавляем неизменные атрибуты в новый объект из переданного объекта
+                            newtimetable.CourseID = timetable.CourseID;  // Добавляем неизменные атрибуты в новый объект из переданного объекта
+                            newtimetable.Note = timetable.Note;  // Добавляем неизменные атрибуты в новый объект из переданного объекта
+                            newtimetable.Startlesson = newstart; // Добавляем изменяемые атрибуты (дата начала занятия) в новый объект
+                            newtimetable.Endlesson = newend; // Добавляем изменяемые атрибуты (дата окончания занятия) в новый объект
+                            listtimetable.Add(newtimetable); // Добавление объекта в лист
+                        }
+
+                        if ((period == "Каждый будний день(пн - пт)") & v == null & (newstart.DayOfWeek != DayOfWeek.Saturday & newstart.DayOfWeek != DayOfWeek.Sunday)) // Добавление для варианта будних дней, т.к. нужно учитывать выходные и не добавлять такие дни в список!
+                        {
+                            Timetable newtimetable = new Timetable(); // Создаем новый экземпляр класса
+                            newtimetable.CabinetID = timetable.CabinetID; // Добавляем неизменные атрибуты в новый объект из переданного объекта
+                            newtimetable.CourseID = timetable.CourseID;  // Добавляем неизменные атрибуты в новый объект из переданного объекта
+                            newtimetable.Note = timetable.Note;  // Добавляем неизменные атрибуты в новый объект из переданного объекта
+                            newtimetable.Startlesson = newstart; // Добавляем изменяемые атрибуты (дата начала занятия) в новый объект
+                            newtimetable.Endlesson = newend; // Добавляем изменяемые атрибуты (дата окончания занятия) в новый объект
+                            listtimetable.Add(newtimetable); // Добавление объекта в лист
                         }
                     }
 
-                    if (period == "Ежедневно")
+                    if (period == "Ежедневно") // Изменение дат исходя из условия
                     {
-  //                      newstart = timetable.Startlesson.AddDays(1);
                         newstart = newstart.AddDays(1);
-                        //                      timetable.Startlesson = newtime;
 
-                        ////newend = timetable.Endlesson.AddDays(1);
                         newend = newend.AddDays(1);
-                        //                      timetable.Endlesson = newtime;
                     }
 
-                    if (period == "Еженедельно")
+                    if (period == "Еженедельно") // Изменение дат исходя из условия
                     {
                         newstart = newstart.AddDays(7);
- //                       timetable.Startlesson = newtime;
 
                         newend = newend.AddDays(7);
- //                       timetable.Endlesson = newtime;
                     }
 
-                    if (period == "Ежемесячно")
+                    if (period == "Ежемесячно") // Изменение дат исходя из условия
                     {
                         newstart = newstart.AddMonths(1);
- //                       timetable.Startlesson = newtime;
 
                         newend = newend.AddMonths(1);
-//                        timetable.Endlesson = newtime;
                     }
 
-                    if (period == "Каждый год")
+                    if (period == "Каждый год") // Изменение дат исходя из условия
                     {
                         newstart = newstart.AddYears(1);
-  //                      timetable.Startlesson = newtime;
 
                         newend = newend.AddYears(1);
-    //                    timetable.Endlesson = newtime;
                     }
 
-                    if (period == "Каждый будний день(пн - пт)")
+                    if (period == "Каждый будний день(пн - пт)") // Изменение дат исходя из условия
                     {
-                        if (timetable.Startlesson.DayOfWeek != DayOfWeek.Saturday || timetable.Startlesson.DayOfWeek != DayOfWeek.Sunday)
+                        //if (newstart.DayOfWeek != DayOfWeek.Saturday || newend.DayOfWeek != DayOfWeek.Sunday)
                         {
                             newstart = newstart.AddDays(1);
-  //                          timetable.Startlesson = newtime;
 
                             newend = newend.AddDays(1);
-   //                         timetable.Endlesson = newtime;
                         }
                     }
-                     
                 }
 
-                using (SampleContext context = new SampleContext())
+                using (SampleContext context = new SampleContext()) // После завершения цикла нужно добавить значения листа в бд
                 {
                     context.Timetables.AddRange(listtimetable);
                     context.SaveChanges();
-                    answer = "Добавление элемента(ов) расписания прошло успешно";
+                    if (listtimetable.Count == 0) // Может быть ситуация, при которой ни один объект не был добавлен в бд, пользователь будет осведомлен
+                    {
+                        return answer = "Ни один элемент расписания не был добавлен";
+                    }
                 }
-                return answer;
-
             }
-            return answer;
+            return answer = "Добавление элемента(ов) расписания прошло успешно";
         }
 
         public string Del()
@@ -174,20 +172,130 @@ namespace Test
             return answer;
         }
 
+
+        public static string addTeacher(Timetable c, Worker w)
+        {
+            TimetablesTeachers cw = new TimetablesTeachers();
+            cw.TimetableID = c.ID;
+            cw.TeacherID = w.ID;
+            string answer = СheckTeac(cw);
+            if (answer == "Данные корректны!")
+            {
+                using (SampleContext context = new SampleContext())
+                {
+                    context.TimetablesTeachers.Add(cw);
+                    context.SaveChanges();
+                    answer = "Добавление преподавателя на это занятие прошло успешно";
+                }
+                return answer;
+            }
+            return answer;
+        }
+
+        public static string delTeacher(Timetable c, Worker w)
+        {
+            TimetablesTeachers cw = new TimetablesTeachers();
+            cw.TimetableID = c.ID;
+            cw.TeacherID = w.ID;
+            string answer = "";
+
+            using (SampleContext context = new SampleContext())
+            {
+                TimetablesTeachers v = new TimetablesTeachers();
+                v = context.TimetablesTeachers.Where(x => x.TeacherID == cw.TeacherID && x.TimetableID == cw.TimetableID).FirstOrDefault<TimetablesTeachers>();
+                context.TimetablesTeachers.Remove(v);
+                context.SaveChanges();
+
+                answer = "Удаление преподавателя с этого занятия прошло успешно";
+            }
+            return answer;
+        }
+
         public string Сheck(Timetable st)
         {
-            //if (st.Name == "")
-            //{ return "Введите название типа курса. Это поле не может быть пустым"; }
-            //if (st.Cost == 0)
-            //{ return "Введите стоимость обучения по данному типу курса. Это поле не может быть пустым"; }
-            ////using (SampleContext context = new SampleContext())
-            ////{
-            ////    Student v = new Student();
-            ////    v = context.Students.Where(x => x.FIO == st.FIO && x.Phone == st.Phone).FirstOrDefault<Student>();
-            ////    if (v != null)
-            ////    { return "Такой ученик уже существует в базе под номером " + v.ID; }
-            ////}
+            if (st.CabinetID == 0)
+            { return "Выберите кабинет. Это поле не может быть пустым"; }
+
+            if (st.CourseID == 0)
+            { return "Выберите курс. Это поле не может быть пустым"; }
+
+            using (SampleContext context = new SampleContext())
+            {
+                Timetable v = context.Timetables.Where(x => x.Startlesson == st.Startlesson & x.CourseID == st.CourseID).FirstOrDefault<Timetable>();
+                if (v != null)
+                { return "Этот курс уже занят элементом расписания №" + v.ID + " в промежутке от " + v.Startlesson + " до " + v.Endlesson; }
+
+                Timetable c = context.Timetables.Where(x => x.Startlesson == st.Startlesson & x.CabinetID == st.CabinetID).FirstOrDefault<Timetable>();
+                if (c != null)
+                { return "Этот кабинет уже занят элементом расписания №" + c.ID + " в промежутке от " + c.Startlesson + " до " + c.Endlesson; }
+
+                List<Student> liststudents = Course.GetStudents(Courses.CourseID(st.CourseID));
+                foreach (Student s in liststudents)
+                {
+                    List<Course> listcourses = Student.GetCourses(s);
+                    foreach (Course co in listcourses)
+                    {
+                        Timetable ts = context.Timetables.Where(x => x.Startlesson == st.Startlesson & x.CourseID == co.ID).FirstOrDefault<Timetable>();
+                        if (ts != null)
+                        { return "Ученик №" + s.ID + " уже занят на курсе №" + co.ID + " элементом расписания №" + ts.ID + " в промежутке от " + ts.Startlesson + " до " + ts.Endlesson; }
+                    }
+                }
+            }
             return "Данные корректны!";
+        }
+
+
+        public static string СheckTeac(TimetablesTeachers stpar)
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                TimetablesTeachers v = new TimetablesTeachers();
+                v = context.TimetablesTeachers.Where(x => x.TeacherID == stpar.TeacherID && x.TimetableID == stpar.TimetableID).FirstOrDefault<TimetablesTeachers>();
+                if (v != null)
+                { return "Этот преподаватель уже числится за этим занятием"; }
+
+                Worker t = Workers.WorkerID(stpar.TeacherID);
+                if (t.Type != 3)
+                { return " Вам нужно было выбрать преподавателя (тип 3)"; }
+            }
+            return "Данные корректны!";
+        }
+
+        //public List<Worker> GetFreeteachers()
+        //{
+        //    List<Worker> freeteachers = new List<Worker>();
+        //    using (SampleContext context = new SampleContext())
+        //    {
+        //        List<Worker> teachers = context.Workers.Where(x => x.Type == 3).ToList<Worker>();
+        //        foreach (Worker t in teachers)
+        //        {
+        //            List<TimetablesTeachers> timetables = context.TimetablesTeachers.Where(x => x.TeacherID == t.ID).ToList<TimetablesTeachers>();
+        //            if(timetables.Count != 0)
+        //            {
+        //                foreach(TimetablesTeachers tt in timetables)
+        //                {
+        //                    Timetable t
+        //                    Timetable time = context.Timetables.Where(x => x.Startlesson == tt. & x.CourseID == co.ID).FirstOrDefault<Timetable>();
+        //                    if (ts != null)
+        //                    { return "Ученик №" + s.ID + " уже занят на курсе №" + co.ID + " элементом расписания №" + ts.ID + " в промежутке от " + ts.Startlesson + " до " + ts.Endlesson; }
+        //                }
+
+        //            }
+        //        }
+
+        //    }
+
+    }
+    public static class Timetables
+    {
+        public static Timetable TimetableID(int id)
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                Timetable v = context.Timetables.Where(x => x.ID == id).FirstOrDefault<Timetable>();
+
+                return v;
+            }
         }
     }
 }

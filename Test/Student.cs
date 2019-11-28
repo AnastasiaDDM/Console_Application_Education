@@ -298,7 +298,8 @@ namespace Test
                             join scour in db.StudentsCourses on s.ID equals scour.StudentID
                             into std_cour_temp
                             from stcour in std_cour_temp.DefaultIfEmpty()
-                              select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
+                            //group StudentID by StudentID
+                              select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID), Count = std_prnt_temp.Count() };
 
 
 
@@ -348,6 +349,23 @@ namespace Test
                     }
                 }
                 else { query = query.OrderBy(u => u.PID); }
+
+                int countrecord = query.GroupBy(u => u.SID).Count();
+
+                //       var querycount = from query Select count(*);
+
+                ////       int countrecord = 0;
+                //       int countrecord =
+
+                //       List<int> stid = new List<int>();
+                //       foreach (var p in query)
+                //       {
+                //           if (stid.Find(x => x == p.SID) == 0)
+                //           {
+                //               stid.Add(p.SID);
+                //               ++countrecord;
+                //           }
+                //       }
 
                 query = query.Skip((page - 1) * count).Take(count);  // Формирование страниц и кол-во записей на странице
 

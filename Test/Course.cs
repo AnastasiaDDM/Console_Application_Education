@@ -273,9 +273,29 @@ namespace Test
             using (SampleContext db = new SampleContext())
             {
 
+                //var query = from s in db.Students
+                //            join sp in db.StudentsParents on s.ID equals sp.StudentID
+                //            into std_prnt_temp
+                //            from std_prnt in std_prnt_temp.DefaultIfEmpty()
+                //            join p in db.Parents on std_prnt.StudentID equals p.ID
+                //            into prnt_temp
+                //            from prnt in prnt_temp.DefaultIfEmpty()
+                //            join c in db.Contracts on s.ID equals c.StudentID
+                //            into cntr_temp
+                //            from cntr in cntr_temp.DefaultIfEmpty()
+                //            join scour in db.StudentsCourses on s.ID equals scour.StudentID
+                //            into std_cour_temp
+                //            from stcour in std_cour_temp.DefaultIfEmpty()
+                //            select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
+
+
+
                 var query = from c in db.Courses
                             join w in db.TeachersCourses on c.ID equals w.CourseID
-                            select new { ID = c.ID, nameGroup = c.nameGroup, Cost = c.Cost, Deldate = c.Deldate, Editdate = c.Editdate, TypeID = c.TypeID, BranchID = c.BranchID, Start =c.Start, End = c.End, TeacherID = w.TeacherID };
+                            into c_teach_temp
+                            from c_teach in c_teach_temp.DefaultIfEmpty()
+
+                            select new { ID = c.ID, nameGroup = c.nameGroup, Cost = c.Cost, Deldate = c.Deldate, Editdate = c.Editdate, TypeID = c.TypeID, BranchID = c.BranchID, Start =c.Start, End = c.End, TeacherID = (c_teach == null ? 0 : c_teach.TeacherID) };
 
 
                 // Последовательно просеиваем наш список 
@@ -336,6 +356,8 @@ namespace Test
                     }
                 }
                 else { query = query.OrderBy(u => u.ID); }
+
+  //              int countrecord = query.Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();
