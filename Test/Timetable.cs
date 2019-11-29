@@ -275,84 +275,205 @@ namespace Test
             return "Данные корректны!";
         }
 
-        //public List<Worker> GetFreeteachers(List<TimeRange> listtimerange)
-        //{
-        //    List<Worker> freeteachers = new List<Worker>(); // Лист свободных преподавателей
-        //    using (SampleContext context = new SampleContext())
-        //    {
-        //        List<Worker> teachers = context.Workers.Where(x => x.Type == 3).ToList<Worker>(); // Отбор только преподавателей
-        //        foreach (Worker t in teachers) // Цикл по каждому преподавателю, для поиска всех эл. расписания, которые еще ведет этот преподаватель
-        //        {
-        //            List<TimetablesTeachers> timetablesT = context.TimetablesTeachers.Where(x => x.TeacherID == t.ID).ToList<TimetablesTeachers>();
-        //            if (timetablesT.Count != 0) // Если список не пуст, значит нужно проверить каждый эл. расписания из этого листа на временное перекрытие с заданным диапазоном
-        //            {
-        //                foreach (TimetablesTeachers tt in timetablesT) // Цикл для каждого элемента расписания одного преподавателя
-        //                {
-        //                    Timetable onetimetable = Timetables.TimetableID(tt.TimetableID); // эл. расписания, который есть у преподавателя (найденный по ID)
-        //                    TimeRange timetablerange = new TimeRange(onetimetable.Startlesson, onetimetable.Endlesson); // Составление интервала для поиска временных перекрытий
-
-        //                    bool overlap = Overlap(timetablerange, listtimerange); // Вызов метода, где проверяется конкретный промежуток расписания с заданным диапазоном!
-        //                    if(overlap == true) // Если эл. расписания не перекрывается ни с одним промежутком из диапазона, то 
-        //                    {
-
-        //                    }
-
-
-        //                }
-
-        //            }
-        //            else
-        //            {
-        //                freeteachers.Add(t);
-        //            }
-        //        }
-
-        //    }
-
-        //}
-
-
-        private bool Overlap(TimeRange timetablerange, List<TimeRange> listtimerange)
+        public static  List<Worker> GetFreeteachers(DateTime Endrepeat, string period, Timetable timetable)  // Поиск свободных на это время преподавателей
         {
-            foreach (TimeRange date in listtimerange)
-            {
-                //// Теперь этот onetimetable нужно сравнить с каждой датой! - и если совпадений нет, то добавить этого преподавателя в лист.
 
-                if (timetablerange.GetIntersection(date) != null)
-                //    Console.WriteLine(timeRange5.GetIntersection(timeRange6).ToString());
-                //if (timeRange5.GetIntersection(timeRange6).ToString() != "")
+            //        List<Worker> teachers = context.Workers.Where(x => x.Type == 3).ToList<Worker>(); // Отбор только преподавателей
+            //        foreach (Worker t in teachers) // Цикл по каждому преподавателю, для поиска всех эл. расписания, которые еще ведет этот преподаватель
+            //        {
+            //            List<TimetablesTeachers> timetablesT = context.TimetablesTeachers.Where(x => x.TeacherID == t.ID).ToList<TimetablesTeachers>();
+            //            if (timetablesT.Count != 0) // Если список не пуст, значит нужно проверить каждый эл. расписания из этого листа на временное перекрытие с заданным диапазоном
+            //            {
+            //                foreach (TimetablesTeachers tt in timetablesT) // Цикл для каждого элемента расписания одного преподавателя
+            //                {
+            //                    Timetable onetimetable = Timetables.TimetableID(tt.TimetableID); // эл. расписания, который есть у преподавателя (найденный по ID)
+            //                    TimeRange timetablerange = new TimeRange(onetimetable.Startlesson, onetimetable.Endlesson); // Составление интервала для поиска временных перекрытий
+
+            //                    bool overlap = Overlap(timetablerange, listtimerange); // Вызов метода, где проверяется конкретный промежуток расписания с заданным диапазоном!
+            //                    if(overlap == true) // Если эл. расписания не перекрывается ни с одним промежутком из диапазона, то 
+            //                    {
+
+            //                    }
+
+
+            //                }
+
+            //            }
+            //            else
+            //            {
+            //                freeteachers.Add(t);
+            //            }
+            //        }
+
+            //    }
+
+            //}
+
+            //        Select* from Worker where
+            //Type = [Учитель]
+            //        and
+            //ID not in
+            //(
+            //Select ID_Teacher from Timetable join TimetableTeachers
+            //on TimetableTeachers.ID_Timetable = Timetable.ID
+
+            //Start_date >= [1_дата_начало] and EndDate <= [1_дата_конец] — вот эти штуки нужно делать в цикле
+            //or
+            //Start_date >= [2_дата_начало] and EndDate <= [2_дата_конец]
+            //or
+            //...
+            //or
+            //Start_date >= [N_дата_начало] and EndDate <= [N_дата_конец]
+            //)
+
+
+
+                List<TimeRange> listtimerange = new List<TimeRange>();
+
+                //Ежедневно
+                //Еженедельно
+                //Ежемесячно
+                //Каждый год
+                //Каждый будний день(пн - пт)
+
+                DateTime newstart = timetable.Startlesson; // Присваиваем дате начала занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
+                DateTime newend = timetable.Endlesson; // Присваиваем дате окончания занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
+
+
+                while (newend <= Endrepeat) // Организуем цикл для перебора всех дат в заданном диапазоне, т.е. до Endrepeat
                 {
-                    //" Наблюдается временное перекрытие -  timetablerange.GetIntersection(date): " +
-                    //              timetablerange.GetIntersection(date);
-                    break;
-                    return false;
+                    using (SampleContext context = new SampleContext())
+                    {
+                        Timetable v = context.Timetables.Where(x => x.Startlesson == newstart).FirstOrDefault<Timetable>();
+
+                        // В первом проходе добавляется или не добавляется начальная дата, а дальше уже происходит увеличение дат
+                        if (v == null & (period != "Каждый будний день(пн - пт)")) // Добавление для всех вариантов, кроме будних дней, т.к. не нужно учитывать выходные!
+                        {
+                            TimeRange Range = new TimeRange(newstart, newend);
+                            listtimerange.Add(Range);
+
+
+                        }
+
+                        if ((period == "Каждый будний день(пн - пт)") & v == null & (newstart.DayOfWeek != DayOfWeek.Saturday & newstart.DayOfWeek != DayOfWeek.Sunday)) // Добавление для варианта будних дней, т.к. нужно учитывать выходные и не добавлять такие дни в список!
+                        {
+                            TimeRange Range = new TimeRange(newstart, newend);
+                            listtimerange.Add(Range);
+                        }
+                    }
+
+                    if (period == "Ежедневно" || period == "Не повторять" || period == "Каждый будний день(пн - пт)") // Изменение дат исходя из условия
+                    {
+                        newstart = newstart.AddDays(1);
+
+                        newend = newend.AddDays(1);
+                    }
+
+                    if (period == "Еженедельно") // Изменение дат исходя из условия
+                    {
+                        newstart = newstart.AddDays(7);
+
+                        newend = newend.AddDays(7);
+                    }
+
+                    if (period == "Ежемесячно") // Изменение дат исходя из условия
+                    {
+                        newstart = newstart.AddMonths(1);
+
+                        newend = newend.AddMonths(1);
+                    }
+
+                    if (period == "Каждый год") // Изменение дат исходя из условия
+                    {
+                        newstart = newstart.AddYears(1);
+
+                        newend = newend.AddYears(1);
+                    }
+
+                    //if (period == "Каждый будний день(пн - пт)") // Изменение дат исходя из условия
+                    //{
+                    //    {
+                    //        newstart = newstart.AddDays(1);
+
+                    //        newend = newend.AddDays(1);
+                    //    }
+                    //}
                 }
-                //else
-                //{
-                //    Console.WriteLine("Временного перекрытия нет!");
-                //}
 
+            List<Worker> freeteachers = new List<Worker>(); // Лист свободных преподавателей
+            using (SampleContext context = new SampleContext())
+            {
+                
 
+                StringBuilder s = new StringBuilder("Select Distinct Workers.* from Workers where Workers.Type = 3 and Workers.ID not in (Select Distinct Workers.ID from Workers join TimetablesTeachers on TimetablesTeachers.TeacherID = Workers.ID and Workers.Type = 3 join Timetables on TimetablesTeachers.TimetableID = Timetables.ID where ");
 
+                List<string> sql = new List<string>();
+                string format = "yyyy-MM-dd HH:mm:ss";
 
-                //if (onetimetable.Startlesson)
-                //{
+                foreach (TimeRange t in listtimerange)
+                {
 
-                //}
+                    sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Внутри
+                    sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Снаружи
+                    sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // верхняя граница
+                    sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format)));// нижняя граница
 
-                //bool overlap = onetimetable.Startlesson < date.Endlesson && date.Startlesson < onetimetable.Endlesson;
+                }
 
-                //TimeRange
+                s.Append(String.Join(" or ", sql));
 
+                var query = context.Workers.SqlQuery(s.ToString() + " group by Workers.ID order by Workers.ID)");
 
-
-
-                // Timetable time = context.Timetables.Where(x => x.Startlesson == timetable.Startlesson & x.CourseID == co.ID).FirstOrDefault<Timetable>(); //
-                //if (ts != null)
-                //{ return "Ученик №" + s.ID + " уже занят на курсе №" + co.ID + " элементом расписания №" + ts.ID + " в промежутке от " + ts.Startlesson + " до " + ts.Endlesson; }
+                foreach (Worker t in query)
+                {
+                    freeteachers.Add(t);
+                }
             }
-            return true;
+            return freeteachers;
         }
+
+
+    //    private bool Overlap(TimeRange timetablerange, List<TimeRange> listtimerange)
+    //    {
+    //        foreach (TimeRange date in listtimerange)
+    //        {
+    //            //// Теперь этот onetimetable нужно сравнить с каждой датой! - и если совпадений нет, то добавить этого преподавателя в лист.
+
+    //            if (timetablerange.GetIntersection(date) != null)
+    //            //    Console.WriteLine(timeRange5.GetIntersection(timeRange6).ToString());
+    //            //if (timeRange5.GetIntersection(timeRange6).ToString() != "")
+    //            {
+    //                //" Наблюдается временное перекрытие -  timetablerange.GetIntersection(date): " +
+    //                //              timetablerange.GetIntersection(date);
+    //                break;
+    //                return false;
+    //            }
+    //            //else
+    //            //{
+    //            //    Console.WriteLine("Временного перекрытия нет!");
+    //            //}
+
+
+
+
+    //            //if (onetimetable.Startlesson)
+    //            //{
+
+    //            //}
+
+    //            //bool overlap = onetimetable.Startlesson < date.Endlesson && date.Startlesson < onetimetable.Endlesson;
+
+    //            //TimeRange
+
+
+
+
+    //            // Timetable time = context.Timetables.Where(x => x.Startlesson == timetable.Startlesson & x.CourseID == co.ID).FirstOrDefault<Timetable>(); //
+    //            //if (ts != null)
+    //            //{ return "Ученик №" + s.ID + " уже занят на курсе №" + co.ID + " элементом расписания №" + ts.ID + " в промежутке от " + ts.Startlesson + " до " + ts.Endlesson; }
+    //        }
+    //        return true;
+    //    }
 
     }
     public static class Timetables

@@ -49,110 +49,178 @@ namespace Test
             String askdesk = "ask";
 
 
-            // --- time range 1 ---
-            TimeRange timeRange1 = new TimeRange(
-              new DateTime(2011, 2, 22, 14, 0, 0),
-              new DateTime(2011, 2, 22, 18, 0, 0));
-            Console.WriteLine("TimeRange1: " + timeRange1);
-            // > TimeRange1: 22.02.2011 14:00:00 - 18:00:00 | 04:00:00
 
-            // --- time range 2 ---
-            TimeRange timeRange2 = new TimeRange(
-              new DateTime(2011, 2, 22, 15, 0, 0),
-              new TimeSpan(2, 0, 0));
-            Console.WriteLine("TimeRange2: " + timeRange2);
-            // > TimeRange2: 22.02.2011 15:00:00 - 17:00:00 | 02:00:00
+            // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
 
-            // --- time range 3 ---
-            TimeRange timeRange3 = new TimeRange(
-              new DateTime(2011, 2, 22, 16, 0, 0),
-              new DateTime(2011, 2, 22, 21, 0, 0));
-            Console.WriteLine("TimeRange3: " + timeRange3);
-            // > TimeRange3: 22.02.2011 16:00:00 - 21:00:00 | 05:00:00
+            ////List<TimeRange> need = new List<TimeRange>();
 
+            //////// Предположим, занимается 26.11 с 9 до 10 (перекрытие по верхней границе)
+            ////need.Add(
+            ////new TimeRange(
+            ////new DateTime(2019, 11, 26, 9, 0, 0),
+            ////new DateTime(2019, 11, 26, 10, 0, 0))
+            ////);
 
+            ////// 27.11 с 12:30 до 13:00 (внутри)
+            ////need.Add(
+            ////new TimeRange(
+            ////new DateTime(2019, 11, 27, 12, 30, 0),
+            ////new DateTime(2019, 11, 27, 13, 00, 0))
+            ////);
 
-            // 12:00 - 13:30
-            TimeRange timeRange4 = new TimeRange(
-              new DateTime(2019, 11, 29, 12, 0, 0),
-              new DateTime(2019, 11, 29, 13, 30, 0));
-            Console.WriteLine("TimeRange4: " + timeRange4);
+            ////// 28.11 с 11:00 до 12:30 (по нижней границе)
+            ////need.Add(
+            ////new TimeRange(
+            ////new DateTime(2019, 11, 28, 11, 00, 0),
+            ////new DateTime(2019, 11, 28, 12, 30, 0))
+            ////);
 
+            ////// 29.11 с 11:30 до 14:00 (снаружи)
+            ////need.Add(
+            ////new TimeRange(
+            ////new DateTime(2019, 11, 29, 11, 30, 0),
+            ////new DateTime(2019, 11, 29, 14, 00, 0))
+            ////);
 
-
-            // 11:30 -12:30
-            TimeRange timeRange5 = new TimeRange(
-              new DateTime(2019, 11, 29, 11, 30, 0),
-              new DateTime(2019, 11, 29, 12, 30, 0));
-            Console.WriteLine("TimeRange5: " + timeRange5);
-
-
-            // 12:40 - 14:00
-            TimeRange timeRange6 = new TimeRange(
-              new DateTime(2019, 11, 29, 12, 29, 0),
-              new DateTime(2019, 11, 29, 14, 00, 0));
-            Console.WriteLine("TimeRange6: " + timeRange6);
+            ////using (SampleContext context = new SampleContext())
+            ////{
 
 
-            Console.WriteLine("TimeRange4.GetIntersection( TimeRange5 ): " +
-                              timeRange4.GetIntersection(timeRange5));
-            Console.WriteLine(timeRange4.GetIntersection(timeRange5).ToString());
-            if(timeRange4.GetIntersection(timeRange5).ToString() !="")
-            {
-                Console.WriteLine(" Наблюдается временное перекрытие - TimeRange4.GetIntersection( TimeRange5 ): " +
-                             timeRange4.GetIntersection(timeRange5));
-            }
+            ////    StringBuilder s = new StringBuilder("Select Distinct Workers.* from Workers where Workers.Type = 3 and Workers.ID not in (Select Distinct Workers.ID from Workers join TimetablesTeachers on TimetablesTeachers.TeacherID = Workers.ID and Workers.Type = 3 join Timetables on TimetablesTeachers.TimetableID = Timetables.ID where ");
 
-            Console.WriteLine("");
+            ////    List<string> sql = new List<string>();
+            ////    string format = "yyyy-MM-dd HH:mm:ss";
 
-           Console.WriteLine("TimeRange5.GetIntersection( TimeRange6 ): " +
-                              timeRange5.GetIntersection(timeRange6));
+            ////    foreach (TimeRange t in need)
+            ////    {
 
-            if (timeRange5.GetIntersection(timeRange6) != null)
-            //    Console.WriteLine(timeRange5.GetIntersection(timeRange6).ToString());
-            //if (timeRange5.GetIntersection(timeRange6).ToString() != "")
-            {
-                Console.WriteLine(" Наблюдается временное перекрытие -  timeRange5.GetIntersection(timeRange6): " +
-                              timeRange5.GetIntersection(timeRange6));
-            }
-            else
-            {
-                Console.WriteLine("Временного перекрытия нет!");
-            }
-            // --- relation ---
-            Console.WriteLine("TimeRange1.GetRelation( TimeRange2 ): " +
-                               timeRange1.GetRelation(timeRange2));
-            // > TimeRange1.GetRelation( TimeRange2 ): Enclosing
-            Console.WriteLine("TimeRange1.GetRelation( TimeRange3 ): " +
-                               timeRange1.GetRelation(timeRange3));
-            // > TimeRange1.GetRelation( TimeRange3 ): EndInside
-            Console.WriteLine("TimeRange3.GetRelation( TimeRange2 ): " +
-                               timeRange3.GetRelation(timeRange2));
-            // > TimeRange3.GetRelation( TimeRange2 ): StartInside
+            ////        sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Внутри
+            ////        sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Снаружи
+            ////        sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // верхняя граница
+            ////        sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format)));// нижняя граница
 
-            // --- intersection ---
-            Console.WriteLine("TimeRange1.GetIntersection( TimeRange2 ): " +
-                               timeRange1.GetIntersection(timeRange2));
-            // > TimeRange1.GetIntersection( TimeRange2 ):
-            //             22.02.2011 15:00:00 - 17:00:00 | 02:00:00
-            Console.WriteLine("TimeRange1.GetIntersection( TimeRange3 ): " +
-                               timeRange1.GetIntersection(timeRange3));
-            // > TimeRange1.GetIntersection( TimeRange3 ):
-            //             22.02.2011 16:00:00 - 18:00:00 | 02:00:00
-            Console.WriteLine("TimeRange3.GetIntersection( TimeRange2 ): " +
-                               timeRange3.GetIntersection(timeRange2));
+            ////    }
 
-            Console.WriteLine("TimeRange3.GetIntersection( TimeRange2 ): " +
-                               timeRange3.GetIntersection(timeRange2));
+            ////    s.Append(String.Join(" or ", sql));
 
-            Console.WriteLine("TimeRange3.GetIntersection( TimeRange2 ): " +
-                               timeRange3.GetIntersection(timeRange2));
+            ////    Console.WriteLine(s);
 
-        // > TimeRange3.GetIntersection( TimeRange2 ):
-        //             22.02.2011 16:00:00 - 17:00:00 | 01:00:00
+            ////    var query = context.Workers.SqlQuery(s.ToString()+" group by Workers.ID order by Workers.ID)");
+
+            ////    foreach (Worker t in query)
+            ////    {
+            ////        Console.WriteLine("{0} {1}", t.ID, t.FIO);
+            ////    }
+
+            ////}
+
+            ////Console.ReadKey();
+            ////Environment.Exit(0);
+
+
+            // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
+
+        ////    // --- time range 1 ---
+        ////    TimeRange timeRange1 = new TimeRange(
+        ////      new DateTime(2011, 2, 22, 14, 0, 0),
+        ////      new DateTime(2011, 2, 22, 18, 0, 0));
+        ////    Console.WriteLine("TimeRange1: " + timeRange1);
+        ////    // > TimeRange1: 22.02.2011 14:00:00 - 18:00:00 | 04:00:00
+
+        ////    // --- time range 2 ---
+        ////    TimeRange timeRange2 = new TimeRange(
+        ////      new DateTime(2011, 2, 22, 15, 0, 0),
+        ////      new TimeSpan(2, 0, 0));
+        ////    Console.WriteLine("TimeRange2: " + timeRange2);
+        ////    // > TimeRange2: 22.02.2011 15:00:00 - 17:00:00 | 02:00:00
+
+        ////    // --- time range 3 ---
+        ////    TimeRange timeRange3 = new TimeRange(
+        ////      new DateTime(2011, 2, 22, 16, 0, 0),
+        ////      new DateTime(2011, 2, 22, 21, 0, 0));
+        ////    Console.WriteLine("TimeRange3: " + timeRange3);
+        ////    // > TimeRange3: 22.02.2011 16:00:00 - 21:00:00 | 05:00:00
 
 
 
+        ////    // 12:00 - 13:30
+        ////    TimeRange timeRange4 = new TimeRange(
+        ////      new DateTime(2019, 11, 29, 12, 0, 0),
+        ////      new DateTime(2019, 11, 29, 13, 30, 0));
+        ////    Console.WriteLine("TimeRange4: " + timeRange4);
+
+
+
+        ////    // 11:30 -12:30
+        ////    TimeRange timeRange5 = new TimeRange(
+        ////      new DateTime(2019, 11, 29, 11, 30, 0),
+        ////      new DateTime(2019, 11, 29, 12, 30, 0));
+        ////    Console.WriteLine("TimeRange5: " + timeRange5);
+
+
+        ////    // 12:40 - 14:00
+        ////    TimeRange timeRange6 = new TimeRange(
+        ////      new DateTime(2019, 11, 29, 12, 29, 0),
+        ////      new DateTime(2019, 11, 29, 14, 00, 0));
+        ////    Console.WriteLine("TimeRange6: " + timeRange6);
+
+
+        ////    Console.WriteLine("TimeRange4.GetIntersection( TimeRange5 ): " +
+        ////                      timeRange4.GetIntersection(timeRange5));
+        ////    Console.WriteLine(timeRange4.GetIntersection(timeRange5).ToString());
+        ////    if(timeRange4.GetIntersection(timeRange5).ToString() !="")
+        ////    {
+        ////        Console.WriteLine(" Наблюдается временное перекрытие - TimeRange4.GetIntersection( TimeRange5 ): " +
+        ////                     timeRange4.GetIntersection(timeRange5));
+        ////    }
+
+        ////    Console.WriteLine("");
+
+        ////   Console.WriteLine("TimeRange5.GetIntersection( TimeRange6 ): " +
+        ////                      timeRange5.GetIntersection(timeRange6));
+
+        ////    if (timeRange5.GetIntersection(timeRange6) != null)
+        ////    //    Console.WriteLine(timeRange5.GetIntersection(timeRange6).ToString());
+        ////    //if (timeRange5.GetIntersection(timeRange6).ToString() != "")
+        ////    {
+        ////        Console.WriteLine(" Наблюдается временное перекрытие -  timeRange5.GetIntersection(timeRange6): " +
+        ////                      timeRange5.GetIntersection(timeRange6));
+        ////    }
+        ////    else
+        ////    {
+        ////        Console.WriteLine("Временного перекрытия нет!");
+        ////    }
+        ////    // --- relation ---
+        ////    Console.WriteLine("TimeRange1.GetRelation( TimeRange2 ): " +
+        ////                       timeRange1.GetRelation(timeRange2));
+        ////    // > TimeRange1.GetRelation( TimeRange2 ): Enclosing
+        ////    Console.WriteLine("TimeRange1.GetRelation( TimeRange3 ): " +
+        ////                       timeRange1.GetRelation(timeRange3));
+        ////    // > TimeRange1.GetRelation( TimeRange3 ): EndInside
+        ////    Console.WriteLine("TimeRange3.GetRelation( TimeRange2 ): " +
+        ////                       timeRange3.GetRelation(timeRange2));
+        ////    // > TimeRange3.GetRelation( TimeRange2 ): StartInside
+
+        ////    // --- intersection ---
+        ////    Console.WriteLine("TimeRange1.GetIntersection( TimeRange2 ): " +
+        ////                       timeRange1.GetIntersection(timeRange2));
+        ////    // > TimeRange1.GetIntersection( TimeRange2 ):
+        ////    //             22.02.2011 15:00:00 - 17:00:00 | 02:00:00
+        ////    Console.WriteLine("TimeRange1.GetIntersection( TimeRange3 ): " +
+        ////                       timeRange1.GetIntersection(timeRange3));
+        ////    // > TimeRange1.GetIntersection( TimeRange3 ):
+        ////    //             22.02.2011 16:00:00 - 18:00:00 | 02:00:00
+        ////    Console.WriteLine("TimeRange3.GetIntersection( TimeRange2 ): " +
+        ////                       timeRange3.GetIntersection(timeRange2));
+
+        ////    Console.WriteLine("TimeRange3.GetIntersection( TimeRange2 ): " +
+        ////                       timeRange3.GetIntersection(timeRange2));
+
+        ////    Console.WriteLine("TimeRange3.GetIntersection( TimeRange2 ): " +
+        ////                       timeRange3.GetIntersection(timeRange2));
+
+        ////// > TimeRange3.GetIntersection( TimeRange2 ):
+        //////             22.02.2011 16:00:00 - 17:00:00 | 01:00:00
 
 
 
@@ -1606,6 +1674,25 @@ namespace Test
                     //Каждый год
                     //Каждый будний день(пн - пт)
 
+                    // при этом запросе не работает правльно! перепроверить нужно !
+
+//                    Select Distinct Workers.* from Workers where Workers.Type = 3 and Workers.ID not in (Select Distinct Workers.ID from Workers left join TimetablesTeachers on TimetablesTeachers.TeacherID = Workers.ID
+//and Workers.Type = 3  join Timetables on TimetablesTeachers.TimetableID = Timetables.ID where
+//(Startlesson >= '2019-11-26 10:00:00' and Endlesson <= '2019-11-26 12:00:00' and Startlesson <= '2019-11-26 12:00:00')
+//or(Startlesson <= '2019-11-26 10:00:00' and Endlesson >= '2019-11-26 12:00:00' and Startlesson <= '2019-11-26 12:00:00')
+//or(Startlesson >= '2019-11-26 10:00:00' and Endlesson >= '2019-11-26 12:00:00' and Startlesson <= '2019-11-26 12:00:00')
+//or(Startlesson <= '2019-11-26 10:00:00' and Endlesson <= '2019-11-26 12:00:00' and Startlesson <= '2019-11-26 12:00:00') group by Workers.ID order by Workers.ID)
+
+
+
+
+
+
+
+
+
+
+
                     Console.WriteLine("Добавление элемента расписания:");
                     Timetable t = new Timetable();
 
@@ -1662,7 +1749,7 @@ namespace Test
 
                     if(repeat == "1")
                     {
-                        Console.WriteLine("Введите параметр повторения 1 - Не повторять, 2 - Ежедневно, 3 - Еженедельно, 4 -Ежемесячно, 5 - Каждый год, 6 - Каждый будний день(пн - пт)");
+                        Console.WriteLine("Введите параметр повторения :  Ежедневно,  Еженедельно,  Ежемесячно,  Каждый год,  Каждый будний день(пн - пт)");
                         string  period = Console.ReadLine();
 
                         Console.WriteLine("Введите день окончания повтора");
@@ -1676,14 +1763,33 @@ namespace Test
 
                         DateTime Endrepeat = new DateTime(Eyear, Emonth, Eday, 23, 59, 59);
 
-                        string ans = t.Add(Endrepeat, period, t);
-                        Console.WriteLine(ans);
+                        List<Worker> freeteachers = Timetable.GetFreeteachers(Endrepeat, period, t);
+                        
+                        foreach(Worker w in freeteachers)
+                        {
+                            Console.WriteLine(w.ID + " " + w.FIO);
+                        }
+
+//                        string ans = t.Add(Endrepeat, period, t);
+//                        Console.WriteLine(ans);
 
                     }
                     else
-                    { 
+                    {
+                        DateTime Endrepeat = Enddate;
+                        string period = "Не повторять";
+
+                        List <Worker> freeteachers = Timetable.GetFreeteachers(Endrepeat, period, t);
+
+                        foreach (Worker w in freeteachers)
+                        {
+                            Console.WriteLine(w.ID + " " + w.FIO);
+                        }
+
                         string ans = t.Add();
                         Console.WriteLine(ans);
+
+
                     }
                 }
 
