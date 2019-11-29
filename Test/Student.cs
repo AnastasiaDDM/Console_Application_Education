@@ -298,10 +298,11 @@ namespace Test
                             join scour in db.StudentsCourses on s.ID equals scour.StudentID
                             into std_cour_temp
                             from stcour in std_cour_temp.DefaultIfEmpty()
-                            //group StudentID by StudentID
-                              select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID), Count = std_prnt_temp.Count() };
+                              //group new { s.ID, s.FIO, s.Phone } by s into percentGroup
+                              //orderby percentGroup.Key
+                select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
 
-
+  //              query = query.GroupBy(v => v.SID);
 
                 // Последовательно просеиваем наш список
 
@@ -349,6 +350,8 @@ namespace Test
                     }
                 }
                 else { query = query.OrderBy(u => u.PID); }
+
+                int countrecord1 = query.Count();
 
                 int countrecord = query.GroupBy(u => u.SID).Count();
 

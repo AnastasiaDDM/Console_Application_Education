@@ -10,6 +10,7 @@ using System.Data.Entity;
 //+ del(): String
 //+ addTeachers(): String DONE
 //+ delTeachers(): String DONE
+//+ GetFreeteachers(DateTime date) : List<Worker> 
 //+ findAll(Start: Datetime, End: Datetime, editDate:	DateTime, delDate:	DateTime, Course: Course, Cabinet: Cabinet, Teacher: Worker): List<Timetable> 
 
 namespace Test
@@ -59,6 +60,7 @@ namespace Test
 
                 DateTime newstart = timetable.Startlesson; // Присваиваем дате начала занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
                 DateTime newend = timetable.Endlesson; // Присваиваем дате окончания занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
+
 
                 while (newend <= Endrepeat) // Организуем цикл для перебора всех дат в заданном диапазоне, т.е. до Endrepeat
                 {
@@ -261,31 +263,52 @@ namespace Test
             return "Данные корректны!";
         }
 
-        //public List<Worker> GetFreeteachers()
-        //{
-        //    List<Worker> freeteachers = new List<Worker>();
-        //    using (SampleContext context = new SampleContext())
-        //    {
-        //        List<Worker> teachers = context.Workers.Where(x => x.Type == 3).ToList<Worker>();
-        //        foreach (Worker t in teachers)
-        //        {
-        //            List<TimetablesTeachers> timetables = context.TimetablesTeachers.Where(x => x.TeacherID == t.ID).ToList<TimetablesTeachers>();
-        //            if(timetables.Count != 0)
-        //            {
-        //                foreach(TimetablesTeachers tt in timetables)
-        //                {
-        //                    Timetable t
-        //                    Timetable time = context.Timetables.Where(x => x.Startlesson == tt. & x.CourseID == co.ID).FirstOrDefault<Timetable>();
-        //                    if (ts != null)
-        //                    { return "Ученик №" + s.ID + " уже занят на курсе №" + co.ID + " элементом расписания №" + ts.ID + " в промежутке от " + ts.Startlesson + " до " + ts.Endlesson; }
-        //                }
+        public List<Worker> GetFreeteachers(List<Timetable> perioddates)
+        {
+            List<Worker> freeteachers = new List<Worker>();
+            using (SampleContext context = new SampleContext())
+            {
+                List<Worker> teachers = context.Workers.Where(x => x.Type == 3).ToList<Worker>();
+                foreach (Worker t in teachers)
+                {
+                    List<TimetablesTeachers> timetablesT = context.TimetablesTeachers.Where(x => x.TeacherID == t.ID).ToList<TimetablesTeachers>();
+                    if (timetablesT.Count != 0)
+                    {
+                        foreach (TimetablesTeachers tt in timetablesT)
+                        {
+                            Timetable onetimetable = Timetables.TimetableID(tt.TimetableID); // эл. расписания, который есть у преподавателя
 
-        //            }
-        //        }
+                            foreach (Timetable date in perioddates)
+                            {
+                                // Теперь этот onetimetable нужно сравнить с каждой датой! - и если совпадений нет, то добавить этого преподавателя в лист.
+                                if(onetimetable.Startlesson)
+                                {
 
-        //    }
+                                }
 
-    }
+                                bool overlap = onetimetable.Startlesson < date.Endlesson && date.Startlesson < onetimetable.Endlesson;
+                                onetimetable.Startlesson.IsSamePeriod()
+
+
+
+
+                                Timetable time = context.Timetables.Where(x => x.Startlesson == timetable.Startlesson & x.CourseID == co.ID).FirstOrDefault<Timetable>(); //
+                                if (ts != null)
+                                { return "Ученик №" + s.ID + " уже занят на курсе №" + co.ID + " элементом расписания №" + ts.ID + " в промежутке от " + ts.Startlesson + " до " + ts.Endlesson; }
+                            }
+                            
+                        }
+
+                    }
+                    else
+                    {
+                        freeteachers.Add(t);
+                    }
+                }
+
+            }
+
+        }
     public static class Timetables
     {
         public static Timetable TimetableID(int id)
