@@ -127,9 +127,9 @@ namespace Test
             return "Данные корректны!";
         }
 
-        public static string addPay(Contract c, Pay p)
+        public string addPay(Pay p)
         {
-            p.ContractID = c.ID;
+            p.ContractID = this.ID;
             string ans = p.Add();
             return ans;
         }
@@ -147,18 +147,18 @@ namespace Test
             }
         }
 
-        public static List<Contract> GetCo()
-        {
-            //      var context = new SampleContext();
-            using (SampleContext db = new SampleContext())
-            {
-                var contracts = db.Contracts.ToList();
-                return contracts;
-            }
-        }
+        //public static List<Contract> GetCo()      // Просто так, для получения нефильтрованного списка
+        //{
+        //    //      var context = new SampleContext();
+        //    using (SampleContext db = new SampleContext())
+        //    {
+        //        var contracts = db.Contracts.ToList();
+        //        return contracts;
+        //    }
+        //}
 
-        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Contract> FindAll(Boolean deldate, Student student, Worker manager, Branch branch, Course course, DateTime mindate, DateTime maxdate, int min, int max, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все договоры //////////////////
+        public static List<Contract> FindAll(Boolean deldate, Student student, Worker manager, Branch branch, Course course, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Contract> list = new List<Contract>();
             using (SampleContext db = new SampleContext())
@@ -219,16 +219,11 @@ namespace Test
 
                 if (sort != null)  // Сортировка, если нужно
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
-                else { query = query.OrderBy(u => u.ID); }
+
+                // Я перепроверила все варианты - это должно работать правильно!
+                int countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

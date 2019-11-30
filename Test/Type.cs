@@ -90,11 +90,11 @@ namespace Test
             return "Данные корректны!";
         }
 
-        public static List<Course> GetCourses(Type s)    // Получение списка курсов этого ученика
+        public List<Course> GetCourses()    // Получение списка курсов этого ученика
         {
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Courses.Where(x => x.TypeID == s.ID).OrderBy(u => u.ID).ToList<Course>();
+                var v = context.Courses.Where(x => x.TypeID == this.ID).OrderBy(u => u.ID).ToList<Course>();
                 return v;
             }
         }
@@ -113,7 +113,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все типы //////////////////
-        public static List<Type> FindAll(Boolean deldate, Type type, int minLes, int maxLes, double minCost, double maxCost, int minMonth, int maxMonth, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Type> FindAll(Boolean deldate, Type type, int minLes, int maxLes, double minCost, double maxCost, int minMonth, int maxMonth, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Type> list = new List<Type>();
             using (SampleContext db = new SampleContext())
@@ -166,16 +166,10 @@ namespace Test
 
                 if (sort != null)  // Сортировка, если нужно
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
-                else { query = query.OrderBy(u => u.ID); }
+
+                int countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

@@ -187,10 +187,10 @@ namespace Test
         }
 
 
-        public static string addTeacher(Timetable c, Worker w)
+        public string addTeacher(Worker w)
         {
             TimetablesTeachers cw = new TimetablesTeachers();
-            cw.TimetableID = c.ID;
+            cw.TimetableID = this.ID;
             cw.TeacherID = w.ID;
             string answer = СheckTeac(cw);
             if (answer == "Данные корректны!")
@@ -206,10 +206,10 @@ namespace Test
             return answer;
         }
 
-        public static string delTeacher(Timetable c, Worker w)
+        public string delTeacher(Worker w)
         {
             TimetablesTeachers cw = new TimetablesTeachers();
-            cw.TimetableID = c.ID;
+            cw.TimetableID = this.ID;
             cw.TeacherID = w.ID;
             string answer = "";
 
@@ -243,10 +243,10 @@ namespace Test
                 if (c != null)
                 { return "Этот кабинет уже занят элементом расписания №" + c.ID + " в промежутке от " + c.Startlesson + " до " + c.Endlesson; }
 
-                List<Student> liststudents = Course.GetStudents(Courses.CourseID(st.CourseID));
+                List<Student> liststudents = Courses.CourseID(st.CourseID).GetStudents();
                 foreach (Student s in liststudents)
                 {
-                    List<Course> listcourses = Student.GetCourses(s);
+                    List<Course> listcourses = s.GetCourses();
                     foreach (Course co in listcourses)
                     {
                         Timetable ts = context.Timetables.Where(x => x.Startlesson == st.Startlesson & x.CourseID == co.ID).FirstOrDefault<Timetable>();
@@ -275,7 +275,7 @@ namespace Test
             return "Данные корректны!";
         }
 
-        public static  List<Worker> GetFreeteachers(DateTime Endrepeat, string period, Timetable timetable)  // Поиск свободных на это время преподавателей
+        public List<Worker> GetFreeteachers(DateTime Endrepeat, string period)  // Поиск свободных на это время преподавателей
         {
 
             //        List<Worker> teachers = context.Workers.Where(x => x.Type == 3).ToList<Worker>(); // Отбор только преподавателей
@@ -336,8 +336,8 @@ namespace Test
                 //Каждый год
                 //Каждый будний день(пн - пт)
 
-                DateTime newstart = timetable.Startlesson; // Присваиваем дате начала занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
-                DateTime newend = timetable.Endlesson; // Присваиваем дате окончания занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
+                DateTime newstart = this.Startlesson; // Присваиваем дате начала занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
+                DateTime newend = this.Endlesson; // Присваиваем дате окончания занятия пока что начальное значение переданное извне, далее эта переменная будет изменяться
 
 
                 while (newend <= Endrepeat) // Организуем цикл для перебора всех дат в заданном диапазоне, т.е. до Endrepeat
@@ -416,7 +416,7 @@ namespace Test
                     sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Внутри
                     sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Снаружи
                     sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // верхняя граница
-                    sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format)));// нижняя граница
+                    sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson <= '{1}' and Endlesson >= '{0}')", t.Start.ToString(format), t.End.ToString(format)));// нижняя граница
 
                 }
 
@@ -487,5 +487,7 @@ namespace Test
                 return v;
             }
         }
+
+
     }
 }

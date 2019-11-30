@@ -69,10 +69,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utilit.cs" />
     <Compile Include="Branch.cs" />
     <Compile Include="Cabinet.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="Course.cs" />
+    <Compile Include="Grade.cs" />
     <Compile Include="Parent.cs" />
     <Compile Include="Parentold.cs" />
     <Compile Include="Parent1.cs" />
@@ -83,9 +85,12 @@
     <Compile Include="StudentsCourses.cs" />
     <Compile Include="StudentsParents.cs" />
     <Compile Include="TeachersCourses.cs" />
+    <Compile Include="Theme.cs" />
     <Compile Include="Timetable.cs" />
     <Compile Include="TimetablesTeachers.cs" />
+    <Compile Include="TimetablesThemes.cs" />
     <Compile Include="Type.cs" />
+    <Compile Include="Visit.cs" />
     <Compile Include="Worker.cs" />
   </ItemGroup>
   <ItemGroup>

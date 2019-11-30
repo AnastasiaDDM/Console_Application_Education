@@ -5,37 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
-//+ add(Pay: Pay): Int DONE
-//+ del(ID: Int): String DONE
-//+ edit(Pay: Pay): String DONE
+//+ edit(Visit: Visit): String DONE
+//+ add(Visit: Visit): Int DONE
+//+ del(ID:Int): String DONE
+//+ findAll(Start:	DateTime, End:	DateTime, visitNumber: Int, Date:	DateTime,
+//                   editDate:	DateTime, delDate:	DateTime, Visit: Bool, Student: Student, 
+//                   Course: Course, sorting : String, ASKorDESK : String, count : Int, page : Int): List<Visit>
 
 namespace Test
 {
-    public class Pay
+    public class Visit
     {
         public int ID { get; set; }
-        public System.DateTime Date { get; set; }
-        public int Indicator { get; set; }           // 1 - договор, 2 - преподаватель
-        public double Payment { get; set; }
-        public string Purpose { get; set; }
-        public string Type { get; set; }
+        public int Vis { get; set; }
         public Nullable<System.DateTime> Deldate { get; set; }
         public Nullable<System.DateTime> Editdate { get; set; }
 
-        public Nullable<int> ContractID { get; set; }
-        public Contract Contract { get; set; }
+        public int StudentID { get; set; }
+        public Student Student { get; set; }
 
-        public Nullable<int> WorkerID { get; set; }
-        public Worker Worker { get; set; }
-
-        public Nullable<int> TimetableID { get; set; }
+        public int TimetableID { get; set; }
         public Timetable Timetable { get; set; }
 
-        public Nullable<int> BranchID { get; set; }
-        public Branch Branch { get; set; }
-
-        public Pay()
-        { }
         public string Add()
         {
             string answer = Сheck(this);
@@ -43,9 +34,9 @@ namespace Test
             {
                 using (SampleContext context = new SampleContext())
                 {
-                    context.Pays.Add(this);
+                    context.Visits.Add(this);
                     context.SaveChanges();
-                    answer = "Добавление оплаты прошло успешно";
+                    answer = "Добавление посещения прошло успешно";
                 }
                 return answer;
             }
@@ -60,7 +51,7 @@ namespace Test
                 this.Deldate = DateTime.Now;
                 context.Entry(this).State = EntityState.Modified;
                 context.SaveChanges();
-                o = "Удаление оплаты прошло успешно";
+                o = "Удаление посещения прошло успешно";
             }
             return o;
         }
@@ -75,14 +66,14 @@ namespace Test
                     this.Editdate = DateTime.Now;
                     context.Entry(this).State = EntityState.Modified;
                     context.SaveChanges();
-                    answer = "Редактирование оплаты прошло успешно";
+                    answer = "Редактирование посещения прошло успешно";
                 }
                 return answer;
             }
             return answer;
         }
 
-        public string Сheck(Pay st)
+        public string Сheck(Visit st)
         {
             //if (st.FIO == "")
             //{ return "Введите ФИО ученика. Это поле не может быть пустым"; }
@@ -99,34 +90,29 @@ namespace Test
         }
     }
 
-    public static class Pays
+    public static class Visits
     {
-
-        public static Pay PayID(int id)
+        public static Visit VisitID(int id)
         {
             using (SampleContext context = new SampleContext())
             {
-                Pay v = context.Pays.Where(x => x.ID == id).FirstOrDefault<Pay>();
-
+                Visit v = context.Visits.Where(x => x.ID == id).FirstOrDefault<Visit>();
                 return v;
             }
         }
 
-        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все оплаты //////////////////
-        public static List<Pay> FindAll(Boolean deldate, Pay pay, Contract contract, Worker teacher, Timetable timetable, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все темы //////////////////
+        public static List<Visit> FindAll(Boolean deldate, Visit visit, Theme theme, Course course, Student student, DateTime mindate, DateTime maxdate, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
-            List<Pay> list = new List<Pay>();
+            List<Visit> list = new List<Visit>();
             using (SampleContext db = new SampleContext())
             {
-
-                //var query = from b in db.Branches
-                //            join w in db.Workers on b.DirectorBranch equals w.ID
-                //            select new { BID = b.ID, BName = b.Name, BAddress = b.Address, BDeldate = b.Deldate, BEditdate = b.Editdate, BDirectorID = b.DirectorBranch, WID = w.ID };
-
-
-                var query = from p in db.Pays
-                          
-                            select p;
+                var query = from tt in db.TimetablesThemes
+                            join t in db.Timetables on tt.TimetableID equals t.ID
+                            join v in db.Visits on t.ID equals v.TimetableID
+                            join s in db.Students on v.StudentID equals s.ID
+                            join sc in db.StudentsCourses on s.ID equals sc.StudentID
+                            select new { ID = v.ID, StudentID = v.StudentID, TimetableID = v.TimetableID, Vis = v.Vis, Deldate = v.Deldate, Editdate = v.Editdate, Theme = tt.ThemeID, Course = sc.CourseID, Date = t.Startlesson };
 
                 // Последовательно просеиваем наш список 
 
@@ -135,33 +121,24 @@ namespace Test
                     query = query.Where(x => x.Deldate == null);
                 }
 
-                if (pay.Type != null)
+                if (visit.ID != 0)
                 {
-                    query = query.Where(x => x.Type == pay.Type);
+                    query = query.Where(x => x.Vis == visit.Vis);
                 }
 
-                if (pay.Indicator != 0)
+                if (course.ID != 0)
                 {
-                    query = query.Where(x => x.Indicator == pay.Indicator);
+                    query = query.Where(x => x.Course == course.ID);
                 }
 
-                if (branch.ID != 0)
+                if (student.ID != 0)
                 {
-                    query = query.Where(x => x.BranchID == branch.ID);
+                    query = query.Where(x => x.StudentID == student.ID);
                 }
 
-                if (contract.ID != 0)
+                if (theme.ID != 0)
                 {
-                    query = query.Where(x => x.ContractID == contract.ID);
-                }
-                if (teacher.ID != 0)
-                {
-                    query = query.Where(x => x.WorkerID == teacher.ID);
-                }
-
-                if (timetable.ID != 0)
-                {
-                    query = query.Where(x => x.TimetableID == timetable.ID);
+                    query = query.Where(x => x.Theme == theme.ID);
                 }
 
                 if (mindate != DateTime.MinValue)
@@ -172,16 +149,6 @@ namespace Test
                 if (maxdate != DateTime.MaxValue)
                 {
                     query = query.Where(x => x.Date <= maxdate);
-                }
-
-                if (min != 0)
-                {
-                    query = query.Where(x => x.Payment >= min);
-                }
-
-                if (max != 0)
-                {
-                    query = query.Where(x => x.Payment <= max);
                 }
 
                 if (sort != null)  // Сортировка, если нужно
@@ -196,7 +163,7 @@ namespace Test
 
                 foreach (var p in query)
                 {
-                    list.Add(new Pay { ID = p.ID, Date = p.Date, BranchID = p.BranchID, ContractID = p.ContractID, WorkerID = p.WorkerID, TimetableID = p.TimetableID, Indicator = p.Indicator, Payment = p.Payment, Purpose = p.Purpose, Type = p.Type, Deldate = p.Deldate, Editdate = p.Editdate });
+                    list.Add(new Visit { ID = p.ID, StudentID = p.StudentID, TimetableID = p.TimetableID, Vis = p.Vis, Deldate = p.Deldate, Editdate = p.Editdate });
                 }
                 return list;
             }

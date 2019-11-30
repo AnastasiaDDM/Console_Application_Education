@@ -25,6 +25,7 @@ namespace Test
         public DbSet<StudentsCourses> StudentsCourses { get; set; }
         public DbSet<TeachersCourses> TeachersCourses { get; set; }
         public DbSet<TimetablesTeachers> TimetablesTeachers { get; set; }
+        public DbSet<TimetablesThemes> TimetablesThemes { get; set; }
 
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Cabinet> Cabinets { get; set; }
@@ -32,6 +33,14 @@ namespace Test
         public DbSet<Course> Courses { get; set; }
         public DbSet<Pay> Pays { get; set; }
         public DbSet<Timetable> Timetables { get; set; }
+        public DbSet<Theme> Themes { get; set; }
+        public DbSet<Grade> Grades { get; set; }
+        public DbSet<Visit> Visits { get; set; }
+
+        internal void SubmitChanges()
+        {
+            throw new NotImplementedException();
+        }
     }
     class Program
     {
@@ -45,80 +54,95 @@ namespace Test
             Boolean deldate = true; // true - неудален false - все!!!
             int count = 10;
             int page = 1;
-            String sort = "";
-            String askdesk = "ask";
+            String sort = "ID";
+            String asсdesс = "asc";
+
+            //SampleContext db = new SampleContext();
+            //Grade gr = new Grade();
+            //gr.StudentID = 3;
+            //gr.ThemeID = 1;
+            //gr.Mark = 5;
+            //db.Grades.Add(gr);
+
+            //Console.WriteLine(gr.ID); //returned 0
+
+            //db.SaveChanges();
+            //Console.WriteLine(gr.ID); //returned 1
 
 
 
-            // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
-
-            ////List<TimeRange> need = new List<TimeRange>();
-
-            //////// Предположим, занимается 26.11 с 9 до 10 (перекрытие по верхней границе)
-            ////need.Add(
-            ////new TimeRange(
-            ////new DateTime(2019, 11, 26, 9, 0, 0),
-            ////new DateTime(2019, 11, 26, 10, 0, 0))
-            ////);
-
-            ////// 27.11 с 12:30 до 13:00 (внутри)
-            ////need.Add(
-            ////new TimeRange(
-            ////new DateTime(2019, 11, 27, 12, 30, 0),
-            ////new DateTime(2019, 11, 27, 13, 00, 0))
-            ////);
-
-            ////// 28.11 с 11:00 до 12:30 (по нижней границе)
-            ////need.Add(
-            ////new TimeRange(
-            ////new DateTime(2019, 11, 28, 11, 00, 0),
-            ////new DateTime(2019, 11, 28, 12, 30, 0))
-            ////);
-
-            ////// 29.11 с 11:30 до 14:00 (снаружи)
-            ////need.Add(
-            ////new TimeRange(
-            ////new DateTime(2019, 11, 29, 11, 30, 0),
-            ////new DateTime(2019, 11, 29, 14, 00, 0))
-            ////);
-
-            ////using (SampleContext context = new SampleContext())
-            ////{
 
 
-            ////    StringBuilder s = new StringBuilder("Select Distinct Workers.* from Workers where Workers.Type = 3 and Workers.ID not in (Select Distinct Workers.ID from Workers join TimetablesTeachers on TimetablesTeachers.TeacherID = Workers.ID and Workers.Type = 3 join Timetables on TimetablesTeachers.TimetableID = Timetables.ID where ");
 
-            ////    List<string> sql = new List<string>();
-            ////    string format = "yyyy-MM-dd HH:mm:ss";
+        // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
 
-            ////    foreach (TimeRange t in need)
-            ////    {
+        ////List<TimeRange> need = new List<TimeRange>();
 
-            ////        sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Внутри
-            ////        sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Снаружи
-            ////        sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // верхняя граница
-            ////        sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format)));// нижняя граница
+        //////// Предположим, занимается 26.11 с 9 до 10 (перекрытие по верхней границе)
+        ////need.Add(
+        ////new TimeRange(
+        ////new DateTime(2019, 11, 26, 9, 0, 0),
+        ////new DateTime(2019, 11, 26, 10, 0, 0))
+        ////);
 
-            ////    }
+        ////// 27.11 с 12:30 до 13:00 (внутри)
+        ////need.Add(
+        ////new TimeRange(
+        ////new DateTime(2019, 11, 27, 12, 30, 0),
+        ////new DateTime(2019, 11, 27, 13, 00, 0))
+        ////);
 
-            ////    s.Append(String.Join(" or ", sql));
+        ////// 28.11 с 11:00 до 12:30 (по нижней границе)
+        ////need.Add(
+        ////new TimeRange(
+        ////new DateTime(2019, 11, 28, 11, 00, 0),
+        ////new DateTime(2019, 11, 28, 12, 30, 0))
+        ////);
 
-            ////    Console.WriteLine(s);
+        ////// 29.11 с 11:30 до 14:00 (снаружи)
+        ////need.Add(
+        ////new TimeRange(
+        ////new DateTime(2019, 11, 29, 11, 30, 0),
+        ////new DateTime(2019, 11, 29, 14, 00, 0))
+        ////);
 
-            ////    var query = context.Workers.SqlQuery(s.ToString()+" group by Workers.ID order by Workers.ID)");
-
-            ////    foreach (Worker t in query)
-            ////    {
-            ////        Console.WriteLine("{0} {1}", t.ID, t.FIO);
-            ////    }
-
-            ////}
-
-            ////Console.ReadKey();
-            ////Environment.Exit(0);
+        ////using (SampleContext context = new SampleContext())
+        ////{
 
 
-            // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
+        ////    StringBuilder s = new StringBuilder("Select Distinct Workers.* from Workers where Workers.Type = 3 and Workers.ID not in (Select Distinct Workers.ID from Workers join TimetablesTeachers on TimetablesTeachers.TeacherID = Workers.ID and Workers.Type = 3 join Timetables on TimetablesTeachers.TimetableID = Timetables.ID where ");
+
+        ////    List<string> sql = new List<string>();
+        ////    string format = "yyyy-MM-dd HH:mm:ss";
+
+        ////    foreach (TimeRange t in need)
+        ////    {
+
+        ////        sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson <= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Внутри
+        ////        sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // Снаружи
+        ////        sql.Add(String.Format("(Startlesson >= '{0}' and Endlesson >= '{1}' and Startlesson <= '{1}')", t.Start.ToString(format), t.End.ToString(format))); // верхняя граница
+        ////        sql.Add(String.Format("(Startlesson <= '{0}' and Endlesson <= '{1}' and Endlesson >= '{0}')", t.Start.ToString(format), t.End.ToString(format)));// нижняя граница
+
+        ////    }
+
+        ////    s.Append(String.Join(" or ", sql));
+
+        ////    Console.WriteLine(s);
+
+        ////    var query = context.Workers.SqlQuery(s.ToString()+" group by Workers.ID order by Workers.ID)");
+
+        ////    foreach (Worker t in query)
+        ////    {
+        ////        Console.WriteLine("{0} {1}", t.ID, t.FIO);
+        ////    }
+
+        ////}
+
+        ////Console.ReadKey();
+        ////Environment.Exit(0);
+
+
+        // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
 
         ////    // --- time range 1 ---
         ////    TimeRange timeRange1 = new TimeRange(
@@ -225,7 +249,7 @@ namespace Test
 
 
         begin:;
-            Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 - ученики , 2 - родители, 3 - филиалы, 4 -договоры, 5 - работники, 6 - кабинеты, 7 - тип курса, 8 - курсы, 9 - оплаты, 10 - расписание");
+            Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 - ученики , 2 - родители, 3 - филиалы, 4 -договоры, 5 - работники, 6 - кабинеты, 7 - тип курса, 8 - курсы, 9 - оплаты, 10 - расписание, 11 - темы, 12 - оценки, 13 - посещаемость");
             int ch = Convert.ToInt32(Console.ReadLine());
 
             if (ch == 1)                     ////////////////////////////////////////////////  УЧЕНИКИ ////////////////////////////////////////////////////////////////////////////
@@ -247,19 +271,19 @@ namespace Test
                 if (choice == 1)
                 {
                     Parent parent = new Parent();
-                    parent.FIO = null;
-                    parent.ID = 0;
-                    parent.Phone = null;
+
+      //              parent.ID = 3;
+
                     Student student = new Student();
-                    //student.ID = 3 ;
-                    //student.FIO = "Анохин Александр";
-                    //student.Phone = "1111111111";
+
+     //               student.FIO = "Анохин Александр";
+     //               student.Phone = "1111111111";
                     Contract contract = new Contract();
                     Course course = new Course();
-   //                 course.ID = 1;
+     //               course.ID = 1;
 
                     List<Student> stud = new List<Student>();
-                    stud = Students.FindAll(deldate, parent, student, contract, course, sort, askdesk, page, count);
+                    stud = Students.FindAll(deldate, parent, student, contract, course, sort, asсdesс, page, count);
 
                     foreach (var s in stud)
                     {
@@ -341,7 +365,7 @@ namespace Test
                     Console.WriteLine("Введите ID ученика");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Student st = Students.StudentID(id);
-                    var listpar = Student.GetParents(st);
+                    var listpar = st.GetParents();
                     foreach (var s in listpar)
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1} \t Phone: {2} \t Deldate: {3} \t Editdate: {4}", s.ID, s.FIO, s.Phone, s.Deldate, s.Editdate);
@@ -353,7 +377,7 @@ namespace Test
                         Console.WriteLine("Введите ID ученика");
                         int id = Convert.ToInt32(Console.ReadLine());
                         Student st = Students.StudentID(id);
-                        var v = Student.GetContracts(st);
+                        var v = st.GetContracts();
                         foreach (var s in v)
                         {
                             Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate);
@@ -375,7 +399,7 @@ namespace Test
                     Parent p = new Parent();
                     p = Parents.ParentID(idp);
 
-                    string Answ = Student.addParent(p, s);
+                    string Answ = s.addParent(p);
                     Console.WriteLine(Answ);
                 }
 
@@ -394,7 +418,7 @@ namespace Test
                     Parent p = new Parent();
                     p = Parents.ParentID(idp);
 
-                    string Answ = Student.delParent(p, s);
+                    string Answ = s.delParent(p);
                     Console.WriteLine(Answ);
                 }
 
@@ -403,7 +427,7 @@ namespace Test
                     Console.WriteLine("Введите ID ученика");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Student st = Students.StudentID(id);
-                    var v = Student.GetCourses(st);
+                    var v = st.GetCourses();
                     foreach (var c in v)
                     {
                         Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4}  \t Start: {5} ", c.ID, c.nameGroup, c.Cost, c.TypeID, c.BranchID, c.Start);
@@ -440,7 +464,7 @@ namespace Test
                     //student.Phone = "1111111111";
 
                     List<Parent> parents = new List<Parent>();
-                    parents = Parents.FindAll(deldate, parent, student, sort, askdesk, page, count);
+                    parents = Parents.FindAll(deldate, parent, student, sort, asсdesс, page, count);
 
                     foreach (var s in parents)
                     {
@@ -506,7 +530,7 @@ namespace Test
                     Console.WriteLine("Введите ID отв. лица");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Parent st = Parents.ParentID(id);
-                    var v = Parent.GetStudents(st);
+                    var v = st.GetStudents();
                     foreach (var s in v)
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1}  \t Phone: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.FIO, s.Phone, s.Deldate, s.Editdate);
@@ -529,7 +553,7 @@ namespace Test
                     Parent p = new Parent();
                     p = Parents.ParentID(idp);
 
-                    string Answ = Student.addParent(p, s);
+                    string Answ = p.addStudent(s);
                     Console.WriteLine(Answ);
                 }
 
@@ -549,7 +573,7 @@ namespace Test
                     Parent p = new Parent();
                     p = Parents.ParentID(idp);
 
-                    string Answ = Student.delParent(p, s);
+                    string Answ = p.delStudent(s);
                     Console.WriteLine(Answ);
                 }
             }
@@ -578,11 +602,11 @@ namespace Test
                     /////////////////////// ВЫЗОВ ПОИСКА ФИЛИАЛОВ ////////////////////////
 
                     Branch branch = new Branch();
-                    //       branch.Address = "ул. Ленина, 6";
+      //                     branch.Address = "ул. Ленина, 6";
                     Worker director = new Worker();
-                    //          director.ID =1;
+      //                        director.ID =4;
                     List<Branch> branches = new List<Branch>();
-                    branches = Branches.FindAll(deldate, branch, director, sort, askdesk, page, count);
+                    branches = Branches.FindAll(deldate, branch, director, sort, asсdesс, page, count);
 
                     foreach (var s in branches)
                     {
@@ -650,7 +674,7 @@ namespace Test
                     Console.WriteLine("Введите ID филиала");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Branch st = Branches.BranchID(id);
-                    var cabinets = Branch.GetCabinets(st);
+                    var cabinets = st.GetCabinets();
                     foreach (var s in cabinets)
                     {
                         Console.WriteLine("ID: {0} \t Number: {1}  \t Capacity: {2} \t  Deldate: {3} \t Editdate: {4} \t BranchID: {5}", s.ID, s.Number, s.Capacity, s.Deldate, s.Editdate, s.BranchID);
@@ -662,7 +686,7 @@ namespace Test
                     Console.WriteLine("Введите ID филиала");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Branch st = Branches.BranchID(id);
-                    var contracts = Branch.GetContracts(st);
+                    var contracts = st.GetContracts();
                     foreach (var s in contracts)
                     {
                         Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate);
@@ -675,7 +699,7 @@ namespace Test
                     Console.WriteLine("Введите ID филиала");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Branch st = Branches.BranchID(id);
-                    var workers = Branch.GetWorkers(st);
+                    var workers = st.GetWorkers();
                     foreach (var s in workers)
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1} \t Type: {2} \t Position:{3} \t BranchID: {4} \t Editdate: {5}  \t Deldate:  {6}", s.ID, s.FIO, s.Type, s.Position, s.BranchID, s.Editdate, s.Deldate);
@@ -687,7 +711,7 @@ namespace Test
                     Console.WriteLine("Введите ID филиала");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Branch st = Branches.BranchID(id);
-                    var courses = Branch.GetCourses(st);
+                    var courses = st.GetCourses();
                     foreach (var s in courses)
                     {
                         Console.WriteLine("ID: {0} \t Start: {1}  \t nameGroup: {2} \t  Type: {3} \t BranchID: {4} \t Deldate: {5}", s.ID, s.Start, s.nameGroup, s.Type, s.BranchID, s.Deldate);
@@ -716,7 +740,7 @@ namespace Test
                      Branch branch = new Branch();
                            //branch.ID = 1;
                     Worker manager = new Worker();
-                    //manager.ID = 5;
+   //                 manager.ID = 5;
                     Student student = new Student();
                     Course course = new Course();
                     DateTime mindate = DateTime.MinValue;
@@ -724,7 +748,7 @@ namespace Test
                     int min = 0;
                     int max = 0;
                     List<Contract> contracts = new List<Contract>();
-                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, askdesk, page, count);
+                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, asсdesс, page, count);
 
                     foreach (var s in contracts)
                     {
@@ -863,7 +887,7 @@ namespace Test
 
                     p.Date = DateTime.Now;
 
-                    string answer1 = Contract.addPay(co, p);
+                    string answer1 = co.addPay( p);
                     Console.WriteLine(answer1);
                 }
 
@@ -919,12 +943,14 @@ namespace Test
                 {
 
                     /////////////////////// ВЫЗОВ ПОИСКА РАБОТНИКОВ ////////////////////////
-                    Branch branch1 = new Branch();
-                    branch1.ID = 0;
+                    Branch branch = new Branch();
+  //                  branch.ID = 2;
                     Worker wor = new Worker();
-                    wor.Type = 0;                             // по идее работает правильно, но лучше перепроверять! 
+                    //                    wor.Type = 1;             
+                    //                   wor.Position = "Директор";
+ //                   wor.FIO = "Газенкампф Галина";
                     List<Worker> workers = new List<Worker>();
-                    workers = Workers.FindAll(deldate, wor, branch1, sort, askdesk, page, count);
+                    workers = Workers.FindAll(deldate, wor, branch, sort, asсdesс, page, count);
 
                     foreach (var s in workers)
                     {
@@ -1058,7 +1084,7 @@ namespace Test
                     Console.WriteLine("Введите ID менеджера");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Worker st = Workers.WorkerID(id);
-                    var v = Worker.GetContracts(st);
+                    var v = st.GetContracts();
                     foreach (var s in v)
                     {
                         Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate);
@@ -1078,16 +1104,16 @@ namespace Test
                 if (choice6 == 1)
                 {
                     /////////////////////// ВЫЗОВ ПОИСКА КАБИНЕТОВ   ////////////////////////
-                    Branch branch1 = new Branch();
-         //           branch1.ID = 0;
+                    Branch branch = new Branch();
+        //            branch.ID = 2;
                     Cabinet cab = new Cabinet();
           //          cab.BranchID = 0;
-          //          cab.Number = "Кабинет математики №1";
+                    //cab.Number = "Кабинет математики №1";
                     int min =0;
                     int max =0;
 
                     List<Cabinet> cabinets = new List<Cabinet>();
-                    cabinets = Cabinets.FindAll(deldate, cab, branch1, min, max, sort, askdesk, page, count);
+                    cabinets = Cabinets.FindAll(deldate, cab, branch, min, max, sort, asсdesс, page, count);
 
                     foreach (var s in cabinets)
                     {
@@ -1177,7 +1203,7 @@ namespace Test
 
 
                     List<Type> stud = new List<Type>();
-                    stud = Types.FindAll(deldate, type, minLes, maxLes, minCost, maxCost, minMonth, maxMonth, sort, askdesk, page, count);
+                    stud = Types.FindAll(deldate, type, minLes, maxLes, minCost, maxCost, minMonth, maxMonth, sort, asсdesс, page, count);
 
                     foreach (var s in stud)
                     {
@@ -1295,7 +1321,7 @@ namespace Test
                     Console.WriteLine("Введите ID типа курса");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Type st = Types.TypeID(id);
-                    var v = Type.GetCourses(st);
+                    var v = st.GetCourses();
                     foreach (var c in v)
                     {
                         Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4}  \t Start: {5} ", c.ID, c.nameGroup, c.Cost, c.TypeID, c.BranchID, c.Start);
@@ -1331,7 +1357,7 @@ namespace Test
                     int min = 0;
                     int max = 0;
                     List<Course> courses = new List<Course>();
-                    courses = Courses.FindAll(deldate, course, type, teacher, branch, mindate, maxdate, min, max, sort, askdesk, page, count);
+                    courses = Courses.FindAll(deldate, course, type, teacher, branch, mindate, maxdate, min, max, sort, asсdesс, page, count);
 
                     foreach (var s in courses)
                     {
@@ -1416,11 +1442,17 @@ namespace Test
                     bra = Branches.BranchID(idb);
                     c.BranchID = bra.ID;
 
-                    Console.WriteLine("Введите дату начала обучения");
-                    DateTime start = Convert.ToDateTime(Console.ReadLine());
+                    Console.WriteLine("Введите дату начала обучения в формате ДД.ММ.ГГГГ");
+                    string start = Console.ReadLine();
+                    string[] w = start.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    DateTime start1 = new DateTime(Convert.ToInt32(w[2]), Convert.ToInt32(w[1]), Convert.ToInt32(w[0]), 0, 0, 0);
+                    c.Start = start1;
 
-                    Console.WriteLine("Введите дату конца обучения");
-                    DateTime end = Convert.ToDateTime(Console.ReadLine());
+                    Console.WriteLine("Введите дату окончания обучения в формате ДД.ММ.ГГГГ");
+                    string end = Console.ReadLine();
+                    string[] wa = end.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    DateTime end1 = new DateTime(Convert.ToInt32(wa[2]), Convert.ToInt32(wa[1]), Convert.ToInt32(wa[0]), 0, 0, 0);
+                    c.End = end1;
 
                     string answer1 = c.Edit();
                     Console.WriteLine(answer1);
@@ -1431,7 +1463,7 @@ namespace Test
                     Console.WriteLine("Введите ID курса");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Course st = Courses.CourseID(id);
-                    var v = Course.GetStudents(st);
+                    var v = st.GetStudents();
                     foreach (var s in v)
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1} \t Phone: {2} \t Deldate: {3} \t Editdate: {4}", s.ID, s.FIO, s.Phone, s.Deldate, s.Editdate);
@@ -1443,7 +1475,7 @@ namespace Test
                     Console.WriteLine("Введите ID курса");
                     int id = Convert.ToInt32(Console.ReadLine());
                     Course st = Courses.CourseID(id);
-                    var v = Course.GetTeachers(st);
+                    var v = st.GetTeachers();
                     foreach (var s in v)
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1} \t Phone: {2} \t Deldate: {3} \t Editdate: {4}", s.ID, s.FIO, s.Phone, s.Deldate, s.Editdate);
@@ -1464,7 +1496,7 @@ namespace Test
                     Worker p = new Worker();
                     p = Workers.WorkerID(idp);
 
-                    string Answ = Course.addTeacher(c, p);
+                    string Answ = c.addTeacher(p);
                     Console.WriteLine(Answ);
                 }
 
@@ -1483,7 +1515,7 @@ namespace Test
                     Worker p = new Worker();
                     p = Workers.WorkerID(idp);
 
-                    string Answ = Course.delTeacher(c, p);
+                    string Answ = c.delTeacher(p);
                     Console.WriteLine(Answ);
                 }
             }
@@ -1521,7 +1553,7 @@ namespace Test
                     int max = 0;
 
                     List<Pay> stud = new List<Pay>();
-                    stud = Pays.FindAll(deldate, pay, contract, teacher, timetable, branch, mindate, maxdate, min, max, sort, askdesk, page, count);
+                    stud = Pays.FindAll(deldate, pay, contract, teacher, timetable, branch, mindate, maxdate, min, max, sort, asсdesс, page, count);
 
                     foreach (var s in stud)
                     {
@@ -1658,7 +1690,7 @@ namespace Test
                     int min = 0;
                     int max = 0;
                     List<Contract> contracts = new List<Contract>();
-                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, askdesk, page, count);
+                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, asсdesс, page, count);
 
                     foreach (var s in contracts)
                     {
@@ -1763,7 +1795,7 @@ namespace Test
 
                         DateTime Endrepeat = new DateTime(Eyear, Emonth, Eday, 23, 59, 59);
 
-                        List<Worker> freeteachers = Timetable.GetFreeteachers(Endrepeat, period, t);
+                        List<Worker> freeteachers = t.GetFreeteachers(Endrepeat, period);
                         
                         foreach(Worker w in freeteachers)
                         {
@@ -1779,7 +1811,7 @@ namespace Test
                         DateTime Endrepeat = Enddate;
                         string period = "Не повторять";
 
-                        List <Worker> freeteachers = Timetable.GetFreeteachers(Endrepeat, period, t);
+                        List <Worker> freeteachers = t.GetFreeteachers(Endrepeat, period);
 
                         foreach (Worker w in freeteachers)
                         {
@@ -1834,76 +1866,345 @@ namespace Test
                     string a = v.Edit();
                     Console.WriteLine(a);
                 }
+            }
 
-                if (choice4 == 5)
+
+            if (ch == 11)                     ////////////////////////////////////////////////  ТЕМЫ ////////////////////////////////////////////////////////////////////////////
+            {
+                Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 до 6.");
+                Console.WriteLine("1 - Вывод всех тем на экран");
+                Console.WriteLine("2 - Добавление новой темы");
+                Console.WriteLine("3 - Удаление темы");
+                Console.WriteLine("4 - Редактирование данных о теме");
+                Console.WriteLine("5 - Список оценок по этой теме");
+                int choice6 = Convert.ToInt32(Console.ReadLine());
+
+                if (choice6 == 1)
                 {
-                    Console.WriteLine("Расторжение договора:");
+                    /////////////////////// ВЫЗОВ ПОИСКА ТЕМ   ////////////////////////
+
+                    DateTime mindate = DateTime.MinValue;
+                    //                   DateTime mindate = new DateTime(2019, 10, 04); // год - месяц - день
+                    DateTime maxdate = DateTime.MaxValue;
+
+                    Theme theme = new Theme();
+ //                   theme.Tema = "Логарифмы";
+
+                    Course course = new Course();
+ //                   course.ID = 1;
+
+                    List<Theme> themes = new List<Theme>();
+                    themes = Themes.FindAll(deldate, theme, course, mindate, maxdate, sort, asсdesс, page, count);
+
+                    foreach (var s in themes)
+                    {
+                        Console.WriteLine("ID: {0} \t Tema: {1}  \t Date: {2} \t  Homework: {3} \t Deadline: {4} \t Deldate: {5}", s.ID, s.Tema, s.Date, s.Homework, s.Deadline, s.Deldate);
+                    }
+                }
+
+                if (choice6 == 2)
+                {
+                    Console.WriteLine("Добавление темы:");
+                    Theme theme = new Theme();
+
+                    Console.WriteLine("Введите название темы");
+                    string tema = Console.ReadLine();
+                    theme.Tema = tema;
+
+                    Console.WriteLine("Введите дату начала прохождения темы в формате ДД.ММ.ГГГГ");
+                    string start = Console.ReadLine();
+                    string[] w = start.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    DateTime start1 = new DateTime(Convert.ToInt32(w[2]), Convert.ToInt32(w[1]), Convert.ToInt32(w[0]), 0, 0, 0);
+                    theme.Date = start1;
+
+                    Console.WriteLine("Введите домашнее задание");
+                    string home = Console.ReadLine();
+                    if (home != "")
+                    {
+                        theme.Homework = home;
+                    }
+                    
+                    Console.WriteLine("Введите конечную дату приема домашней работы в формате ДД.ММ.ГГГГ");
+                    string deadline = Console.ReadLine();
+                    if (deadline != "")
+                    {
+                        string[] d = deadline.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                        DateTime dead = new DateTime(Convert.ToInt32(d[2]), Convert.ToInt32(d[1]), Convert.ToInt32(d[0]), 0, 0, 0);
+                        theme.Deadline = dead;
+                    }
+
+                    string answer = theme.Add();
+                    Console.WriteLine(answer);
+                }
+
+                if (choice6 == 3)
+                {
+                    Console.WriteLine("Удаление темы:");
                     Console.WriteLine("Введите ID");
                     int id = Convert.ToInt32(Console.ReadLine());
-                    Contract v = Contracts.ContractID(id);
-                    string a = v.Cancellation();
+                    Theme theme = Themes.ThemeID(id);
+                    string a = theme.Del();
                     Console.WriteLine(a);
                 }
 
-                if (choice4 == 6)
+                if (choice6 == 4)
                 {
-                    Console.WriteLine("Добавление оплаты:");
-                    Pay p = new Pay();
-                    Console.WriteLine("Введите ID Договора");
-                    int idc = Convert.ToInt32(Console.ReadLine());
-                    Contract co = new Contract();
-                    co = Contracts.ContractID(idc);
-                    p.ContractID = co.ID;
-                    p.Indicator = 1;
+                    Console.WriteLine("Редактирование темы:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Theme theme = Themes.ThemeID(id);
 
+                    Console.WriteLine("Введите название темы");
+                    string tema = Console.ReadLine();
+                    theme.Tema = tema;
 
-                    Console.WriteLine("Введите размер оплаты");
-                    double payment = Convert.ToDouble(Console.ReadLine());
-                    p.Payment = payment;
+                    Console.WriteLine("Введите дату начала прохождения темы в формате ДД.ММ.ГГГГ");
+                    string start = Console.ReadLine();
+                    string[] w = start.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    DateTime start1 = new DateTime(Convert.ToInt32(w[2]), Convert.ToInt32(w[1]), Convert.ToInt32(w[0]), 0, 0, 0);
+                    theme.Date = start1;
 
-                    Console.WriteLine("Введите тип оплаты");
-                    string p2 = Console.ReadLine();
-                    if (p2 != "")
+                    Console.WriteLine("Введите домашнее задание");
+                    string home = Console.ReadLine();
+                    if (home != "")
                     {
-                        p.Type = p2;
+                        theme.Homework = home;
                     }
 
-                    Console.WriteLine("Введите назначение оплаты");
-                    string p3 = Console.ReadLine();
-                    if (p3 != "")
+                    Console.WriteLine("Введите конечную дату приема домашней работы в формате ДД.ММ.ГГГГ");
+                    string deadline = Console.ReadLine();
+                    if (deadline != "")
                     {
-                        p.Purpose = p3;
+                        string[] d = deadline.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                        DateTime dead = new DateTime(Convert.ToInt32(d[2]), Convert.ToInt32(d[1]), Convert.ToInt32(d[0]), 0, 0, 0);
+                        theme.Deadline = dead;
                     }
 
-                    p.Date = DateTime.Now;
 
-                    string answer1 = Contract.addPay(co, p);
-                    Console.WriteLine(answer1);
+                    string a = theme.Edit();
+                    Console.WriteLine(a);
+                }
+
+                if (choice6 == 5)
+                {
+                    Console.WriteLine("Введите ID темы");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Theme st = Themes.ThemeID(id);
+                    var v = st.GetGrades();
+                    foreach (var s in v)
+                    {
+                        Console.WriteLine("ID: {0} \t StudentID: {1}  \t ThemeID: {2} \t  Deldate: {3} \t Editdate: {4} \t Mark: {5}", s.ID, s.StudentID, s.ThemeID, s.Deldate, s.Editdate, s.Mark);
+                    }
+                }
+            }
+
+            if (ch == 12)                     ////////////////////////////////////////////////  ОЦЕНКИ ////////////////////////////////////////////////////////////////////////////
+            {
+                Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 до 6.");
+                Console.WriteLine("1 - Вывод всех оценок на экран");
+                Console.WriteLine("2 - Добавление новой оценки");
+                Console.WriteLine("3 - Удаление оценки");
+                Console.WriteLine("4 - Редактирование данных оо оценке");
+                int choice6 = Convert.ToInt32(Console.ReadLine());
+
+                if (choice6 == 1)
+                {
+                    /////////////////////// ВЫЗОВ ПОИСКА ОЦЕНОК   ////////////////////////
+
+                    Grade grade = new Grade();
+
+                    Theme theme = new Theme();
+   //                 theme.ID = 1;
+
+                    Course course = new Course();
+  //                  course.ID = 1;
+
+                    Student stedent = new Student();
+ //                   stedent.ID = 7;
+
+                    DateTime mindate = DateTime.MinValue;
+      //                                 DateTime mindate = new DateTime(2019, 11, 27); // год - месяц - день
+                    DateTime maxdate = DateTime.MaxValue;
+
+                    int min = 0;
+                    int max = 0;
+
+                    List<Grade> grades = new List<Grade>();
+                    grades = Grades.FindAll(deldate, grade, theme, course, stedent, mindate, maxdate, min, max, sort, asсdesс, page, count);
+
+                    foreach (var s in grades)
+                    {
+                        Console.WriteLine("ID: {0} \t StudentID: {1}  \t ThemeID: {2} \t  Deldate: {3} \t Editdate: {4} \t Mark: {5}", s.ID, s.StudentID, s.ThemeID, s.Deldate, s.Editdate, s.Mark);
+                    }
+                }
+
+                if (choice6 == 2)
+                {
+                    Console.WriteLine("Добавление оценки:");
+                    Grade grade = new Grade();
+
+                    Console.WriteLine("Введите оценку");
+                    int mark = Convert.ToInt32(Console.ReadLine());
+                    grade.Mark = mark;
+
+                    //  Добавление происходит без поиска самих объектов! Я считаю, что это вообще не нужно! нужно подумать
+                    Console.WriteLine("Введите ID  ученика");
+                    int ids = Convert.ToInt32(Console.ReadLine());
+                    grade.StudentID = ids;
+
+                    Console.WriteLine("Введите ID темы");
+                    int idt = Convert.ToInt32(Console.ReadLine());
+                    grade.ThemeID = idt;
+
+                    string answer = grade.Add();
+                    Console.WriteLine(answer);
+                }
+
+                if (choice6 == 3)
+                {
+                    Console.WriteLine("Удаление оценки:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Grade v = Grades.GradeID(id);
+                    string a = v.Del();
+                    Console.WriteLine(a);
+                }
+
+                if (choice6 == 4)
+                {
+                    Console.WriteLine("Редактирование оценки:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Grade grade = Grades.GradeID(id);
+
+                    Console.WriteLine("Введите оценку");
+                    int mark = Convert.ToInt32(Console.ReadLine());
+                    grade.Mark = mark;
+
+                    //  Добавление происходит без поиска самих объектов! Я считаю, что это вообще не нужно! нужно подумать
+                    Console.WriteLine("Введите ID  ученика");
+                    int ids = Convert.ToInt32(Console.ReadLine());
+                    grade.StudentID = ids;
+
+                    Console.WriteLine("Введите ID темы");
+                    int idt = Convert.ToInt32(Console.ReadLine());
+                    grade.ThemeID = idt;
+
+                    string a = grade.Edit();
+                    Console.WriteLine(a);
                 }
             }
 
 
-                ////////////using (SampleContext db = new SampleContext())
-                ////////////{
+            if (ch == 13)                     ////////////////////////////////////////////////  ПОСЕЩАЕМОСТЬ ////////////////////////////////////////////////////////////////////////////
+            {
+                Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 до 6.");
+                Console.WriteLine("1 - Вывод всех посещений на экран");
+                Console.WriteLine("2 - Добавление нового посещения");
+                Console.WriteLine("3 - Удаление посещения");
+                Console.WriteLine("4 - Редактирование данных о посещение");
+                int choice6 = Convert.ToInt32(Console.ReadLine());
 
-                ////////////    // вывод 
-                ////////////    foreach (Contract pl in db.Contracts.Include(p => p.Student))
-                ////////////        Console.WriteLine("{0} - {1}", pl.ID, pl.Student != null ? pl.Student.FIO : "");
-                ////////////    Console.WriteLine();
-                ////////////    foreach (Student t in db.Students.Include(t => t.Contracts))
-                ////////////    {
-                ////////////        Console.WriteLine("Ученик: {0} - {1}", t.ID, t.FIO);
-                ////////////        foreach (Contract pl in t.Contracts)
-                ////////////        {
-                ////////////            Console.WriteLine("{0} - {1}", pl.ID, pl.ManagerID);
-                ////////////        }
-                ////////////        Console.WriteLine();
-                ////////////    }
-                ////////////}
+                if (choice6 == 1)
+                {
+                    /////////////////////// ВЫЗОВ ПОИСКА ПОСЕЩЕНИЙ   ////////////////////////
+                    Branch branch1 = new Branch();
+                    //           branch1.ID = 0;
+                    Cabinet cab = new Cabinet();
+                    //          cab.BranchID = 0;
+                    //          cab.Number = "Кабинет математики №1";
+                    int min = 0;
+                    int max = 0;
+
+                    List<Cabinet> cabinets = new List<Cabinet>();
+                    cabinets = Cabinets.FindAll(deldate, cab, branch1, min, max, sort, asсdesс, page, count);
+
+                    foreach (var s in cabinets)
+                    {
+                        Console.WriteLine("ID: {0} \t Number: {1}  \t Capacity: {2} \t  Deldate: {3} \t Editdate: {4} \t BranchID: {5}", s.ID, s.Number, s.Capacity, s.Deldate, s.Editdate, s.BranchID);
+                    }
+                }
+
+                if (choice6 == 2)
+                {
+                    Console.WriteLine("Добавление кабинета:");
+
+                    Console.WriteLine("Введите номер кабинета");
+                    string num = Console.ReadLine();
+
+                    Console.WriteLine("Введите вместимость кабинета");
+                    int cap = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите ID филиала");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Branch br = new Branch();
+                    br = Branches.BranchID(id);
+
+
+                    Cabinet cab = new Cabinet();
+                    cab.Number = num;
+                    cab.Capacity = cap;
+                    cab.BranchID = br.ID;
+                    string answer = cab.Add();
+                    Console.WriteLine(answer);
+                }
+
+                if (choice6 == 3)
+                {
+                    Console.WriteLine("Удаление кабинета:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Cabinet v = Cabinets.CabinetID(id);
+                    string a = v.Del();
+                    Console.WriteLine(a);
+                }
+
+                if (choice6 == 4)
+                {
+                    Console.WriteLine("Редактирование кабинета:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Cabinet v = Cabinets.CabinetID(id);
+
+                    Console.WriteLine("Введите номер кабинета");
+                    string num = Console.ReadLine();
+
+                    Console.WriteLine("Введите вместимость кабинета");
+                    int cap = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Введите ID филиала");
+                    int idbr = Convert.ToInt32(Console.ReadLine());
+
+                    v.Number = num;
+                    v.BranchID = idbr;
+                    v.Capacity = cap;
+
+                    string a = v.Edit();
+                    Console.WriteLine(a);
+                }
+            }
+
+            ////////////using (SampleContext db = new SampleContext())
+            ////////////{
+
+            ////////////    // вывод 
+            ////////////    foreach (Contract pl in db.Contracts.Include(p => p.Student))
+            ////////////        Console.WriteLine("{0} - {1}", pl.ID, pl.Student != null ? pl.Student.FIO : "");
+            ////////////    Console.WriteLine();
+            ////////////    foreach (Student t in db.Students.Include(t => t.Contracts))
+            ////////////    {
+            ////////////        Console.WriteLine("Ученик: {0} - {1}", t.ID, t.FIO);
+            ////////////        foreach (Contract pl in t.Contracts)
+            ////////////        {
+            ////////////            Console.WriteLine("{0} - {1}", pl.ID, pl.ManagerID);
+            ////////////        }
+            ////////////        Console.WriteLine();
+            ////////////    }
+            ////////////}
 
 
 
-                Console.WriteLine("Повторить? Введдите q.");
+            Console.WriteLine("Повторить? Введдите q.");
             string f = Console.ReadLine();
             if (f == "q")
             {

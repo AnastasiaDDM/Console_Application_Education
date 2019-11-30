@@ -72,7 +72,7 @@ namespace Test
             return answer;
         }
 
-        public static List<Student> GetStudents(Parent par)   // Получение списка учеников этого родителя
+        public List<Student> GetStudents()   // Получение списка учеников этого родителя
         {
             List<Student> liststudents = new List<Student>();
             using (SampleContext db = new SampleContext())
@@ -83,7 +83,7 @@ namespace Test
                                select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = p.ID, ParID = sp.ParentID, StID = sp.StudentID };
 
 
-                students = students.Where(x => x.ParID == par.ID );
+                students = students.Where(x => x.ParID == this.ID);
                 students = students.Where(x => x.SID == x.StID);
 
                 foreach (var p in students)
@@ -122,11 +122,11 @@ namespace Test
             return "Данные корректны!";
         }
 
-        public static string addStudent(Parent par, Student st)
+        public string addStudent(Student st)
         {
             StudentsParents stpar = new StudentsParents();
             stpar.StudentID = st.ID;
-            stpar.ParentID = par.ID;
+            stpar.ParentID = this.ID;
             string answer = СheckSt(stpar);
             if (answer == "Данные корректны!")
             {
@@ -141,11 +141,11 @@ namespace Test
             return answer;
         }
 
-        public static string delStudent(Parent par, Student st)
+        public string delStudent(Student st)
         {
             StudentsParents stpar = new StudentsParents();
             stpar.StudentID = st.ID;
-            stpar.ParentID = par.ID;
+            stpar.ParentID = this.ID;
             string answer = "";
 
             using (SampleContext context = new SampleContext())
@@ -161,9 +161,7 @@ namespace Test
         }
     }
 
-
-
-        public static class Parents
+    public static class Parents
     {
         public static Parent ParentID(int id)
         {
@@ -176,24 +174,24 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех родителей //////////////////
-        public static List<Parent> FindAll(Boolean deldate,Parent parent, Student student, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Parent> FindAll(Boolean deldate, Parent parent, Student student, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Parent> parentList = new List<Parent>();
 
-            using (SampleContext db = new SampleContext())          
+            using (SampleContext db = new SampleContext())
             {
                 // Соединение необходимых таблиц
                 var parents = from p in db.Parents
-                join sp in db.StudentsParents on p.ID equals sp.ParentID
-                join s in db.Students on sp.StudentID equals s.ID
-                              select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, SPhone = s.Phone, SFIO = s.FIO, SID = s.ID };
+                              join sp in db.StudentsParents on p.ID equals sp.ParentID
+                              join s in db.Students on sp.StudentID equals s.ID
+                              select new { ID = p.ID, Phone = p.Phone, FIO = p.FIO, Deldate = p.Deldate, Editdate = p.Editdate, SPhone = s.Phone, SFIO = s.FIO, SID = s.ID };
 
 
-                    // Последовательно просеиваем наш список
+                // Последовательно просеиваем наш список
 
                 if (deldate != false) // Убираем удаленных, если нужно
                 {
-                    parents = parents.Where(x => x.PDelDate == null);
+                    parents = parents.Where(x => x.Deldate == null);
                 }
 
                 if (student.Phone != null)
@@ -213,38 +211,50 @@ namespace Test
 
                 if (parent.FIO != null)
                 {
-                    parents = parents.Where(x => x.PFIO == parent.FIO);
+                    parents = parents.Where(x => x.FIO == parent.FIO);
                 }
 
                 if (parent.Phone != null)
                 {
-                    parents = parents.Where(x => x.PPhone == parent.Phone);
+                    parents = parents.Where(x => x.Phone == parent.Phone);
                 }
 
-                if (sort != null)  // Сортировка, если нужно
+                var query2 = parents.GroupBy(s => new { s.ID, s.FIO, s.Phone, s.Editdate, s.Deldate }, (key, group) => new
                 {
-                    if (askdesk == "desk")
-                    {
-                        parents = parents.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        parents = parents.OrderBy(u => sort);
-                    }
+                    ID = key.ID,
+                    FIO = key.FIO,
+                    Phone = key.Phone,
+                    Editdate = key.Editdate,
+                    Deldate = key.Deldate,
+                });
+
+                if (sort != null) // Сортировка, если нужно
+                {
+                    query2 = Utilit.OrderByDynamic(query2, sort, asсdesс);
                 }
-                else { parents = parents.OrderBy(u => u.PID);  }
 
-                parents = parents.Skip((page-1) * count).Take(count);  // Формирование страниц и кол-во записей на странице
 
-                foreach (var p in parents) 
-                {
-                    if (parentList.Find(x => x.ID == p.PID) == null)
-                    {
-                        parentList.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO }); // Добавление родителя в лист, если такого еще нет, это для предохранения от дубликатов
-                    }
-                }       
-                return parentList;
+                int countrecord = query2.GroupBy(u => u.ID).Count();
+
+                query2 = query2.Skip((page - 1) * count).Take(count); // Формирование страниц и кол-во записей на странице
+
+                foreach (var p in query2)
+
+                    //if (sort != null)  // Сортировка, если нужно
+                    //{
+                    //    parents = Utilit.OrderByDynamic(parents, sort, askdesk);
+                    //}
+
+                    //parents = parents.Skip((page-1) * count).Take(count);  // Формирование страниц и кол-во записей на странице
+
+                    //foreach (var p in parents) 
+                    //{
+                    //    if (parentList.Find(x => x.ID == p.ID) == null)
+                    //    {
+                    parentList.Add(new Parent { ID = p.ID, Phone = p.Phone, Deldate = p.Deldate, FIO = p.FIO, Editdate = p.Editdate }); // Добавление родителя в лист, если такого еще нет, это для предохранения от дубликатов
+                        //}
             }
+            return parentList;
         }
     }
 }

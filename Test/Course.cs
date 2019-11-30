@@ -136,7 +136,7 @@ namespace Test
         }
 
 
-        public static List<Student> GetStudents(Course course)    // Получение списка  учеников этого курса
+        public List<Student> GetStudents()    // Получение списка  учеников этого курса
         {
             List<Student> liststudents = new List<Student>();
             using (SampleContext db = new SampleContext())
@@ -146,7 +146,7 @@ namespace Test
                               join s in db.Students on sc.StudentID equals s.ID
                               select new { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, StID = sc.StudentID, CoID = sc.CourseID };
 
-                students = students.Where(x => x.CoID == course.ID);
+                students = students.Where(x => x.CoID == this.ID);
                 students = students.Where(x => x.SID == x.StID);
 
                 foreach (var p in students)
@@ -157,7 +157,7 @@ namespace Test
             }
         }
 
-        public static List<Worker> GetTeachers(Course course)    // Получение списка  преподавателей этого курса
+        public List<Worker> GetTeachers()    // Получение списка  преподавателей этого курса
         {
             List<Worker> liststeachers = new List<Worker>();
             using (SampleContext db = new SampleContext())
@@ -167,7 +167,7 @@ namespace Test
                                join w in db.Workers on tc.TeacherID equals w.ID
                                select new { SID = w.ID, SPhone = w.Phone, SFIO = w.FIO, SDelDate = w.Deldate, TecID = tc.TeacherID, CoID = tc.CourseID };
 
-                teachers = teachers.Where(x => x.CoID == course.ID);
+                teachers = teachers.Where(x => x.CoID == this.ID);
                 teachers = teachers.Where(x => x.SID == x.TecID);
 
                 foreach (var p in teachers)
@@ -178,10 +178,10 @@ namespace Test
             }
         }
 
-        public static string addTeacher(Course c, Worker w)
+        public string addTeacher( Worker w)
         {
             TeachersCourses cw = new TeachersCourses();
-            cw.CourseID = c.ID;
+            cw.CourseID = this.ID;
             cw.TeacherID = w.ID;
             string answer = СheckTeac(cw);
             if (answer == "Данные корректны!")
@@ -197,10 +197,10 @@ namespace Test
             return answer;
         }
 
-        public static string delTeacher(Course c, Worker w)
+        public string delTeacher(Worker w)
         {
             TeachersCourses cw = new TeachersCourses();
-            cw.CourseID = c.ID;
+            cw.CourseID = this.ID;
             cw.TeacherID = w.ID;
             string answer = "";
 
@@ -216,10 +216,10 @@ namespace Test
             return answer;
         }
 
-        public static string addStudent(Course c, Student s)
+        public string addStudent(Student s)
         {
             StudentsCourses sc = new StudentsCourses();
-            sc.CourseID = c.ID;
+            sc.CourseID = this.ID;
             sc.StudentID = s.ID;
             string answer = СheckStud(sc);
             if (answer == "Данные корректны!")
@@ -235,10 +235,10 @@ namespace Test
             return answer;
         }
 
-        public static string delStudent(Course c, Student s)
+        public string delStudent(Student s)
         {
             StudentsCourses cw = new StudentsCourses();
-            cw.CourseID = c.ID;
+            cw.CourseID = this.ID;
             cw.StudentID = s.ID;
             string answer = "";
 
@@ -267,7 +267,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Course> FindAll(Boolean deldate, Course course, Type type, Worker teacher, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Course> FindAll(Boolean deldate, Course course, Type type, Worker teacher, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Course> list = new List<Course>();
             using (SampleContext db = new SampleContext())
@@ -346,18 +346,10 @@ namespace Test
 
                 if (sort != null)  // Сортировка, если нужно
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
-                else { query = query.OrderBy(u => u.ID); }
 
-  //              int countrecord = query.Count();
+                int countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

@@ -111,7 +111,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все кабинеты //////////////////
-        public static List<Cabinet> FindAll(Boolean deldate, Cabinet cabinet, Branch branch, int min, int max, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Cabinet> FindAll(Boolean deldate, Cabinet cabinet, Branch branch, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Cabinet> list = new List<Cabinet>();
             using (SampleContext db = new SampleContext())
@@ -152,16 +152,11 @@ namespace Test
 
                 if (sort != null)  // Сортировка, если нужно
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
-                else { query = query.OrderBy(u => u.ID); }
+
+                // Я перепроверила все варианты - это должно работать правильно!
+                int countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

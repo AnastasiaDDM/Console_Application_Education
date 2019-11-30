@@ -99,11 +99,11 @@ namespace Test
         }
 
 
-        public static List<Contract> GetContracts(Worker st)
+        public List<Contract> GetContracts()
         {
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Contracts.Where(x => x.ManagerID == st.ID).OrderBy(u => u.ID).ToList<Contract>();
+                var v = context.Contracts.Where(x => x.ManagerID == this.ID).OrderBy(u => u.ID).ToList<Contract>();
                 return v;
             }
         }
@@ -121,17 +121,17 @@ namespace Test
             }
         }
 
-        public static List<Worker> GetWo(SampleContext context)
-        {
-            //      var context = new SampleContext();
+        //public static List<Worker> GetWo(SampleContext context)
+        //{
+        //    //      var context = new SampleContext();
 
-            var workers = context.Workers.ToList();
-            return workers;
-        }
+        //    var workers = context.Workers.ToList();
+        //    return workers;
+        //}
 
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Worker> FindAll(Boolean deldate, Worker worker, Branch branch, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Worker> FindAll(Boolean deldate, Worker worker, Branch branch, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Worker> list = new List<Worker>();
             using (SampleContext db = new SampleContext())
@@ -169,33 +169,28 @@ namespace Test
                 if (branch.ID != 0)
                 {
                     query = query.Where(x => x.BranchID == branch.ID);
-                } 
+                }
 
                 if (sort != null)  // Сортировка, если нужно
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
-                else { query = query.OrderBy(u => u.ID); }
 
 
-                int countrecord = 0;
+                //    int countrecord = 0;
 
-                List<int> stid = new List<int>();
-                foreach (var p in query)
-                {
-                    if (stid.Find(x => x == p.ID) == 0)
-                    {
-                        stid.Add(p.ID);
-                        ++countrecord;
-                    }
-                }
+                //List<int> stid = new List<int>();
+                //foreach (var p in query)
+                //{
+                //    if (stid.Find(x => x == p.ID) == 0)
+                //    {
+                //        stid.Add(p.ID);
+                //        ++countrecord;
+                //    }
+                //}
+
+                // Я перепроверила все варианты - это должно работать правильно!
+                int countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
 

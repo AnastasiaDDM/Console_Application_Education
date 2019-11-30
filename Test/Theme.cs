@@ -5,37 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
-//+ add(Pay: Pay): Int DONE
+//+ edit(Theme: Theme): String DONE
+//+ add(Theme: Theme): Int DONE
 //+ del(ID: Int): String DONE
-//+ edit(Pay: Pay): String DONE
+//+ getGrade(ID:Int): List<Grade> DONE
+//+ findAll(Start:	DateTime, End:	DateTime, themeNumber: Int, Date:	DateTime, 
+//                                  editDate:	DateTime, delDate:	DateTime, Course: Course,
+//                                  Theme: String, sorting : String, ASKorDESK : String, count : Int, page : Int): List<Theme>
 
 namespace Test
 {
-    public class Pay
+    public class Theme
     {
         public int ID { get; set; }
-        public System.DateTime Date { get; set; }
-        public int Indicator { get; set; }           // 1 - договор, 2 - преподаватель
-        public double Payment { get; set; }
-        public string Purpose { get; set; }
-        public string Type { get; set; }
+        public DateTime Date { get; set; }
+        public string Tema { get; set; }
+        public string Homework { get; set; }
+        public Nullable<System.DateTime> Deadline { get; set; }
         public Nullable<System.DateTime> Deldate { get; set; }
         public Nullable<System.DateTime> Editdate { get; set; }
 
-        public Nullable<int> ContractID { get; set; }
-        public Contract Contract { get; set; }
-
-        public Nullable<int> WorkerID { get; set; }
-        public Worker Worker { get; set; }
-
-        public Nullable<int> TimetableID { get; set; }
-        public Timetable Timetable { get; set; }
-
-        public Nullable<int> BranchID { get; set; }
-        public Branch Branch { get; set; }
-
-        public Pay()
-        { }
         public string Add()
         {
             string answer = Сheck(this);
@@ -43,9 +32,9 @@ namespace Test
             {
                 using (SampleContext context = new SampleContext())
                 {
-                    context.Pays.Add(this);
+                    context.Themes.Add(this);
                     context.SaveChanges();
-                    answer = "Добавление оплаты прошло успешно";
+                    answer = "Добавление темы прошло успешно";
                 }
                 return answer;
             }
@@ -60,7 +49,7 @@ namespace Test
                 this.Deldate = DateTime.Now;
                 context.Entry(this).State = EntityState.Modified;
                 context.SaveChanges();
-                o = "Удаление оплаты прошло успешно";
+                o = "Удаление темы прошло успешно";
             }
             return o;
         }
@@ -75,14 +64,14 @@ namespace Test
                     this.Editdate = DateTime.Now;
                     context.Entry(this).State = EntityState.Modified;
                     context.SaveChanges();
-                    answer = "Редактирование оплаты прошло успешно";
+                    answer = "Редактирование темы прошло успешно";
                 }
                 return answer;
             }
             return answer;
         }
 
-        public string Сheck(Pay st)
+        public string Сheck(Theme st)
         {
             //if (st.FIO == "")
             //{ return "Введите ФИО ученика. Это поле не может быть пустым"; }
@@ -97,36 +86,43 @@ namespace Test
             //}
             return "Данные корректны!";
         }
-    }
 
-    public static class Pays
-    {
-
-        public static Pay PayID(int id)
+        public List<Grade> GetGrades()
         {
             using (SampleContext context = new SampleContext())
             {
-                Pay v = context.Pays.Where(x => x.ID == id).FirstOrDefault<Pay>();
+                var v = context.Grades.Where(x => x.ThemeID == this.ID).OrderBy(u => u.ID).ToList<Grade>();
+                return v;
+            }
+        }
+    }
 
+
+    public static class Themes
+    {
+        public static Theme ThemeID(int id)
+        {
+            using (SampleContext context = new SampleContext())
+            {
+                Theme v = context.Themes.Where(x => x.ID == id).FirstOrDefault<Theme>();
                 return v;
             }
         }
 
-        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все оплаты //////////////////
-        public static List<Pay> FindAll(Boolean deldate, Pay pay, Contract contract, Worker teacher, Timetable timetable, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все темы //////////////////
+        public static List<Theme> FindAll(Boolean deldate, Theme theme, Course course, DateTime mindate, DateTime maxdate, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
-            List<Pay> list = new List<Pay>();
+            List<Theme> list = new List<Theme>();
             using (SampleContext db = new SampleContext())
-            {
-
-                //var query = from b in db.Branches
-                //            join w in db.Workers on b.DirectorBranch equals w.ID
-                //            select new { BID = b.ID, BName = b.Name, BAddress = b.Address, BDeldate = b.Deldate, BEditdate = b.Editdate, BDirectorID = b.DirectorBranch, WID = w.ID };
-
-
-                var query = from p in db.Pays
-                          
-                            select p;
+            {           // Left jion для соединения таблиц, чтобы высвечивались все темы, не зависимо от того, если ли по этим темам занятия(Timetable)
+                var query = from t in db.Themes
+                            join tt in db.TimetablesThemes on t.ID equals tt.ThemeID
+                            into theme_time_temp
+                            from theme_time in theme_time_temp.DefaultIfEmpty()
+                            join s in db.Timetables on theme_time.TimetableID equals s.ID
+                            into time_temp
+                            from time in time_temp.DefaultIfEmpty()
+                            select new { ID = t.ID, Date = t.Date, Tema = t.Tema, Homework = t.Homework, Deadline = t.Deadline, Deldate = t.Deldate, Editdate = t.Editdate, Course = (time == null ? 0 : time.CourseID) /*, ThTi = (theme_time == null ? 0 : theme_time.ID) */};
 
                 // Последовательно просеиваем наш список 
 
@@ -135,33 +131,14 @@ namespace Test
                     query = query.Where(x => x.Deldate == null);
                 }
 
-                if (pay.Type != null)
+                if (theme.Tema != null)
                 {
-                    query = query.Where(x => x.Type == pay.Type);
+                    query = query.Where(x => x.Tema == theme.Tema);
                 }
 
-                if (pay.Indicator != 0)
+                if (course.ID != 0)
                 {
-                    query = query.Where(x => x.Indicator == pay.Indicator);
-                }
-
-                if (branch.ID != 0)
-                {
-                    query = query.Where(x => x.BranchID == branch.ID);
-                }
-
-                if (contract.ID != 0)
-                {
-                    query = query.Where(x => x.ContractID == contract.ID);
-                }
-                if (teacher.ID != 0)
-                {
-                    query = query.Where(x => x.WorkerID == teacher.ID);
-                }
-
-                if (timetable.ID != 0)
-                {
-                    query = query.Where(x => x.TimetableID == timetable.ID);
+                    query = query.Where(x => x.Course == course.ID);
                 }
 
                 if (mindate != DateTime.MinValue)
@@ -172,16 +149,6 @@ namespace Test
                 if (maxdate != DateTime.MaxValue)
                 {
                     query = query.Where(x => x.Date <= maxdate);
-                }
-
-                if (min != 0)
-                {
-                    query = query.Where(x => x.Payment >= min);
-                }
-
-                if (max != 0)
-                {
-                    query = query.Where(x => x.Payment <= max);
                 }
 
                 if (sort != null)  // Сортировка, если нужно
@@ -196,7 +163,7 @@ namespace Test
 
                 foreach (var p in query)
                 {
-                    list.Add(new Pay { ID = p.ID, Date = p.Date, BranchID = p.BranchID, ContractID = p.ContractID, WorkerID = p.WorkerID, TimetableID = p.TimetableID, Indicator = p.Indicator, Payment = p.Payment, Purpose = p.Purpose, Type = p.Type, Deldate = p.Deldate, Editdate = p.Editdate });
+                    list.Add(new Theme { ID = p.ID, Date = p.Date, Tema = p.Tema, Homework = p.Homework, Deadline = p.Deadline, Deldate = p.Deldate, Editdate = p.Editdate });
                 }
                 return list;
             }

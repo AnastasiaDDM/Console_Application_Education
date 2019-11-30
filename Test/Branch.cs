@@ -38,8 +38,8 @@ namespace Test
 
         public Branch()
         {
-            Contracts = new List<Contract>();
-            Cabinets = new List<Cabinet>();
+            //Contracts = new List<Contract>();
+            //Cabinets = new List<Cabinet>();
         }
 
         public string Add()
@@ -115,38 +115,38 @@ namespace Test
             return "Данные корректны!";
         }
 
-        public static List<Cabinet> GetCabinets(Branch st) // можно вводить только существующий ID филиала
+        public List<Cabinet> GetCabinets() // можно вводить только существующий ID филиала
         {
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Cabinets.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Cabinet>();
+                var v = context.Cabinets.Where(x => x.BranchID == this.ID).OrderBy(u => u.ID).ToList<Cabinet>();
                 return v;
             }
         }
 
-        public static List<Contract> GetContracts(Branch st) // можно вводить только существующий ID филиала
+        public List<Contract> GetContracts() // можно вводить только существующий ID филиала
         {
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Contracts.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Contract>();
+                var v = context.Contracts.Where(x => x.BranchID == this.ID).OrderBy(u => u.ID).ToList<Contract>();
                 return v;
             }
         }
 
-        public static List<Worker> GetWorkers(Branch st) // можно вводить только существующий ID филиала
+        public List<Worker> GetWorkers() // можно вводить только существующий ID филиала
         {
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Workers.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Worker>();
+                var v = context.Workers.Where(x => x.BranchID == this.ID).OrderBy(u => u.ID).ToList<Worker>();
                 return v;
             }
         }
 
-        public static List<Course> GetCourses(Branch st) // можно вводить только существующий ID филиала
+        public List<Course> GetCourses() // можно вводить только существующий ID филиала
         {
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Courses.Where(x => x.BranchID == st.ID).OrderBy(u => u.ID).ToList<Course>();
+                var v = context.Courses.Where(x => x.BranchID == this.ID).OrderBy(u => u.ID).ToList<Course>();
                 return v;
             }
         }
@@ -165,7 +165,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Branch> FindAll(Boolean deldate, Branch branch, Worker director, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Branch> FindAll(Boolean deldate, Branch branch, Worker director, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Branch> list = new List<Branch>();
             using (SampleContext db = new SampleContext())
@@ -173,49 +173,44 @@ namespace Test
 
                 var query = from b in db.Branches
                             join w in db.Workers on b.DirectorBranch equals w.ID
-                            select new { BID = b.ID, BName = b.Name, BAddress = b.Address, BDeldate = b.Deldate, BEditdate = b.Editdate, BDirectorID = b.DirectorBranch, WID = w.ID };
+                            select new { ID = b.ID, Name = b.Name, Address = b.Address, Deldate = b.Deldate, Editdate = b.Editdate, DirectorID = b.DirectorBranch, WID = w.ID };
 
                 // Последовательно просеиваем наш список 
 
                 if (deldate != false) // Убираем удаленных, если нужно
                 {
-                    query = query.Where(x => x.BDeldate == null);
+                    query = query.Where(x => x.Deldate == null);
                 }
 
                 if (branch.Name != null)
                 {
-                    query = query.Where(x => x.BName == branch.Name);
+                    query = query.Where(x => x.Name == branch.Name);
                 }
 
                 if (branch.Address != null)
                 {
-                    query = query.Where(x => x.BAddress == branch.Address);
+                    query = query.Where(x => x.Address == branch.Address);
                 }
 
                 if (director.ID != 0)
                 {
-                    query = query.Where(x => x.BDirectorID == director.ID);
+                    query = query.Where(x => x.DirectorID == director.ID);
                 }
 
                 if (sort != null)  // Сортировка, если нужно
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
-                else { query = query.OrderByDescending(u => u.BID); }
+
+                // Я перепроверила все варианты - это должно работать правильно!
+                int countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();
 
                 foreach (var p in query)
                 {
-                    list.Add(new Branch { ID = p.BID, Name = p.BName, Address = p.BAddress, DirectorBranch = p.BDirectorID, Deldate = p.BDeldate, Editdate = p.BEditdate });
+                    list.Add(new Branch { ID = p.ID, Name = p.Name, Address = p.Address, DirectorBranch = p.DirectorID, Deldate = p.Deldate, Editdate = p.Editdate });
                 }
                 return list;
             }

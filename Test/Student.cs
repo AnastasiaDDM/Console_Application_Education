@@ -31,12 +31,11 @@ namespace Test
         public Nullable<System.DateTime> Deldate { get; set; }
         public Nullable<System.DateTime> Editdate { get; set; }
 
-
-        public ICollection<Contract> Contracts { get; set; }
+        //public ICollection<Contract> Contracts { get; set; }
 
         public Student()
         {
-            Contracts = new List<Contract>();
+            //Contracts = new List<Contract>();
         }
 
         public string Add()
@@ -114,17 +113,17 @@ namespace Test
         }
 
 
-        public static List<Contract> GetContracts(Student st)
+        public List<Contract> GetContracts()
         {
             //      var context = new SampleContext();
             using (SampleContext context = new SampleContext())
             {
-                var v = context.Contracts.Where(x => x.StudentID == st.ID).OrderBy(u => u.ID).ToList<Contract>();
+                var v = context.Contracts.Where(x => x.StudentID == this.ID).OrderBy(u => u.ID).ToList<Contract>();
                 return v;
             }
         }
 
-        public static List<Course> GetCourses(Student s)    // Получение списка курсов этого ученика
+        public List<Course> GetCourses()    // Получение списка курсов этого ученика
         {
             List<Course> listcourses = new List<Course>();
             using (SampleContext db = new SampleContext())
@@ -133,7 +132,7 @@ namespace Test
                             join sc in db.StudentsCourses on c.ID equals sc.CourseID
                             select new { ID = c.ID, nameGroup = c.nameGroup, Cost = c.Cost, TypeID = c.TypeID, BranchID = c.BranchID, Start = c.Start, End = c.End, EditDate = c.Editdate, DelDate = c.Deldate, CourID = sc.CourseID, StID = sc.StudentID };
 
-                query = query.Where(x => x.StID == s.ID);
+                query = query.Where(x => x.StID == this.ID);
                 query = query.Where(x => x.ID == x.CourID);
 
                 foreach (var c in query)
@@ -144,7 +143,7 @@ namespace Test
             }
         }
 
-        public static List<Parent> GetParents(Student s)    // Получение списка родителей этого ученика
+        public List<Parent> GetParents()    // Получение списка родителей этого ученика
         {
             List<Parent> listparents = new List<Parent>();
             using (SampleContext db = new SampleContext())
@@ -153,7 +152,7 @@ namespace Test
                               join sp in db.StudentsParents on p.ID equals sp.ParentID
                               select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, ParID = sp.ParentID, StID = sp.StudentID };
 
-                parents = parents.Where(x => x.StID == s.ID);
+                parents = parents.Where(x => x.StID == this.ID);
                 parents = parents.Where(x => x.PID == x.ParID);
 
                 foreach (var p in parents)
@@ -164,10 +163,10 @@ namespace Test
             }
         }
 
-        public static string addParent(Parent par, Student st)
+        public string addParent(Parent par)
         {
             StudentsParents stpar = new StudentsParents();
-            stpar.StudentID = st.ID;
+            stpar.StudentID = this.ID;
             stpar.ParentID = par.ID;
             string answer = СheckPar(stpar);
             if (answer == "Данные корректны!")
@@ -176,17 +175,19 @@ namespace Test
                 {
                     context.StudentsParents.Add(stpar);
                     context.SaveChanges();
+                    int IDInsert = stpar.ParentID;
                     answer = "Добавление отв.лица к ученику прошло успешно";
+                    List<Parent> possibleparents = stpar.StudentID.GetPossibleparents(IDInsert);
                 }
                 return answer;
             }
             return answer;
         }
 
-        public static string delParent(Parent par, Student st)
+        public string delParent(Parent par)
         {
             StudentsParents stpar = new StudentsParents();
-            stpar.StudentID = st.ID;
+            stpar.StudentID = this.ID;
             stpar.ParentID = par.ID;
             string answer = "";
 
@@ -200,6 +201,27 @@ namespace Test
                     answer = "Удаление отв.лица у ученика прошло успешно";
                 }
                 return answer;
+        }
+
+
+        public List<Parent> GetPossibleparents(int IDInsert)
+        {
+            List<Parent> listparents = new List<Parent>();
+            using (SampleContext db = new SampleContext())
+            {
+                var parents = from p in db.Parents
+                              join sp in db.StudentsParents on p.ID equals sp.ParentID
+                              select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, ParID = sp.ParentID, StID = sp.StudentID };
+
+                parents = parents.Where(x => x.StID == this.ID);
+                parents = parents.Where(x => x.PID == x.ParID);
+
+                foreach (var p in parents)
+                {
+                    listparents.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO });
+                }
+                return listparents;
+            }
         }
     }
 
@@ -216,18 +238,18 @@ namespace Test
             }
         }
 
-        public static List<Student> GetSt()
-        {
-            //      var context = new SampleContext();
-            using (SampleContext context = new SampleContext())
-            {
-                var students = context.Students.ToList();
-                return students;
-            }
-        }
+        //public static List<Student> GetSt()
+        //{
+        //    //      var context = new SampleContext();
+        //    using (SampleContext context = new SampleContext())
+        //    {
+        //        var students = context.Students.ToList();
+        //        return students;
+        //    }
+        //}
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех учеников //////////////////
-        public static List<Student> FindAll(Boolean deldate, Parent parent, Student student, Contract contracnt, Course course, String sort, String askdesk, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Student> FindAll(Boolean deldate, Parent parent, Student student, Contract contracnt, Course course, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
         {
             List<Student> stList = new List<Student>();
 
@@ -300,25 +322,25 @@ namespace Test
                             from stcour in std_cour_temp.DefaultIfEmpty()
                               //group new { s.ID, s.FIO, s.Phone } by s into percentGroup
                               //orderby percentGroup.Key
-                select new  { SID = s.ID, SPhone = s.Phone, SFIO = s.FIO, SDelDate = s.Deldate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
+                select new  { ID = s.ID, Phone = s.Phone, FIO = s.FIO, Deldate = s.Deldate, Editdate = s.Editdate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
 
-  //              query = query.GroupBy(v => v.SID);
+                //query = query.GroupBy(u => u.SID);
 
                 // Последовательно просеиваем наш список
 
                 if (deldate != false) // Убираем удаленных, если нужно
                 {
-                    query = query.Where(x => x.SDelDate == null);
+                    query = query.Where(x => x.Deldate == null);
                 }
 
                 if (student.FIO != null)
                 {
-                    query = query.Where(x => x.SFIO == student.FIO);
+                    query = query.Where(x => x.FIO == student.FIO);
                 }
 
                 if (student.Phone != null)
                 {
-                    query = query.Where(x => x.SPhone == student.Phone);
+                    query = query.Where(x => x.Phone == student.Phone);
                 }
 
                 if (parent.ID != 0)
@@ -338,48 +360,102 @@ namespace Test
 
                 query = query.Distinct();
 
-                if (sort != null)  // Сортировка, если нужно
+                var query2 = query.GroupBy(s => new { s.ID, s.Phone, s.FIO, s.Deldate, s.Editdate }, (key, group) => new
                 {
-                    if (askdesk == "desk")
-                    {
-                        query = query.OrderByDescending(u => sort);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(u => sort);
-                    }
+                    ID = key.ID,
+                    Phone = key.Phone,
+                    FIO = key.FIO,
+                    Deldate = key.Deldate,
+                    Editdate = key.Editdate
+                });
+
+                // query2 = query2.Distinct();
+
+                if (sort != null) // Сортировка, если нужно
+                {
+                    //if (askdesk == "desc")
+                    //{
+                    //    query2 = query2.OrderByDescending(u => sort);
+                    //}
+                    //else
+                    //{
+                    //    query2 = query2.OrderBy(u => sort);
+                    //}
+                    query2 = Utilit.OrderByDynamic(query2, sort, asсdesс);
                 }
-                else { query = query.OrderBy(u => u.PID); }
 
-                int countrecord1 = query.Count();
+                int countrecord = query2.Count();
 
-                int countrecord = query.GroupBy(u => u.SID).Count();
+                //int countrecord = query2.GroupBy(u => u.ID).Count();
 
-                //       var querycount = from query Select count(*);
+                // var querycount = from query Select count(*);
 
-                ////       int countrecord = 0;
-                //       int countrecord =
+                //// int countrecord = 0;
+                // int countrecord =
 
-                //       List<int> stid = new List<int>();
-                //       foreach (var p in query)
-                //       {
-                //           if (stid.Find(x => x == p.SID) == 0)
-                //           {
-                //               stid.Add(p.SID);
-                //               ++countrecord;
-                //           }
-                //       }
+                // List<int> stid = new List<int>();
+                // foreach (var p in query)
+                // {
+                // if (stid.Find(x => x == p.SID) == 0)
+                // {
+                // stid.Add(p.SID);
+                // ++countrecord;
+                // }
+                // }
 
-                query = query.Skip((page - 1) * count).Take(count);  // Формирование страниц и кол-во записей на странице
+                query2 = query2.Skip((page - 1) * count).Take(count); // Формирование страниц и кол-во записей на странице
 
-                foreach (var p in query)
+                foreach (var p in query2)
                 {
-                    if (stList.Find(x => x.ID == p.SID) == null)
+                    // if (stList.Find(x => x.ID == p.SID) == null)
                     {
-                        stList.Add(new Student { ID = p.SID, Phone = p.SPhone, Deldate = p.SDelDate, FIO = p.SFIO }); // Добавление ученика в лист, если такого еще нет, это для предохранения от дубликатов
+                        stList.Add(new Student { ID = p.ID, Phone = p.Phone, Deldate = p.Deldate, FIO = p.FIO, Editdate = p.Editdate }); // Добавление ученика в лист, если такого еще нет, это для предохранения от дубликатов
                     }
                 }
                 return stList;
+
+                ////if (sort != null)  // Сортировка, если нужно
+                ////{
+                ////    if (askdesk == "desk")
+                ////    {
+                ////        query = query.OrderByDescending(u => sort);
+                ////    }
+                ////    else
+                ////    {
+                ////        query = query.OrderBy(u => sort);
+                ////    }
+                ////}
+                ////else { query = query.OrderBy(u => u.SID); }
+
+                ////int countrecord1 = query.Count();
+
+                ////int countrecord = query.GroupBy(u => u.SID).Count();
+
+                //////       var querycount = from query Select count(*);
+
+                ////////       int countrecord = 0;
+                //////       int countrecord =
+
+                //////       List<int> stid = new List<int>();
+                //////       foreach (var p in query)
+                //////       {
+                //////           if (stid.Find(x => x == p.SID) == 0)
+                //////           {
+                //////               stid.Add(p.SID);
+                //////               ++countrecord;
+                //////           }
+                //////       }
+
+                ////query = query.Skip((page - 1) * count).Take(count);  // Формирование страниц и кол-во записей на странице
+
+                ////foreach (var p in query)
+                ////{
+                ////    if (stList.Find(x => x.ID == p.SID) == null)
+                ////    {
+                ////        stList.Add(new Student { ID = p.SID, Phone = p.SPhone, Deldate = p.SDelDate, FIO = p.SFIO }); // Добавление ученика в лист, если такого еще нет, это для предохранения от дубликатов
+                ////    }
+                ////}
+                ////return stList;
             }
         }
 
