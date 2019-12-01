@@ -177,7 +177,9 @@ namespace Test
                     context.SaveChanges();
                     int IDInsert = stpar.ParentID;
                     answer = "Добавление отв.лица к ученику прошло успешно";
-                    List<Parent> possibleparents = stpar.StudentID.GetPossibleparents(IDInsert);
+
+                    //  Вызов метода поиска возможных родителей
+                    //                   List<Parent> possibleparents = Students.StudentID(stpar.StudentID).GetPossibleparents();
                 }
                 return answer;
             }
@@ -191,37 +193,48 @@ namespace Test
             stpar.ParentID = par.ID;
             string answer = "";
 
-                using (SampleContext context = new SampleContext())
-                {
-                    StudentsParents v = new StudentsParents();
-                    v = context.StudentsParents.Where(x => x.StudentID == stpar.StudentID && x.ParentID == stpar.ParentID).FirstOrDefault<StudentsParents>();
-                    context.StudentsParents.Remove(v);
-                    context.SaveChanges();
+            using (SampleContext context = new SampleContext())
+            {
+                StudentsParents v = new StudentsParents();
+                v = context.StudentsParents.Where(x => x.StudentID == stpar.StudentID && x.ParentID == stpar.ParentID).FirstOrDefault<StudentsParents>();
+                context.StudentsParents.Remove(v);
+                context.SaveChanges();
 
-                    answer = "Удаление отв.лица у ученика прошло успешно";
-                }
-                return answer;
+                answer = "Удаление отв.лица у ученика прошло успешно";
+            }
+            return answer;
         }
 
-
-        public List<Parent> GetPossibleparents(int IDInsert)
+        public List<Parent> GetPossibleparents()
         {
             List<Parent> listparents = new List<Parent>();
             using (SampleContext db = new SampleContext())
             {
-                var parents = from p in db.Parents
-                              join sp in db.StudentsParents on p.ID equals sp.ParentID
-                              select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, ParID = sp.ParentID, StID = sp.StudentID };
+                var query = from p in db.Parents
+                            join sp in db.StudentsParents on p.ID equals sp.ParentID
+                            select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, PEditDate = p.Editdate, ParID = sp.ParentID, StID = sp.StudentID };
 
-                parents = parents.Where(x => x.StID == this.ID);
-                parents = parents.Where(x => x.PID == x.ParID);
+                var query1 = query.Where(x => x.StID == this.ID); // Здесь выбираются уже существующие родители конкретного студента
 
-                foreach (var p in parents)
+
+                // Этот запрос выбирает всех учеников у всех найденных выше родителей, кроме переданного ученика из общего запроса query и из первого query1, который является как бы фильтром
+                var selectedStudent = query.SelectMany(u => query1,
+                    (u, q1) => new { IDpar = u.PID, Lang = q1.PID, IDst = u.StID })
+                     .Where(u => u.IDpar == u.Lang & u.IDst != this.ID);
+
+                // Этот запрос выбирает всех родителей, кроме предыдущего(тот, который уже есть) - как раз таки это возможные родители, от всех учеников предыдущего запроса
+                // То есть, этот запрос формируется на основе query и запроса selectedStudent, который как бы выполняет роль фильтра - выбирая тех родителей, у которых есть студенты из selectedStudent
+                var selectedParents = query.SelectMany(u => selectedStudent,
+                    (u, q1) => new { IDpar = u.PID, FIO = u.PFIO, Phone = u.PPhone, Deldate = u.PDelDate, Editdate = u.PEditDate, IDst = u.StID, Lang = q1.IDst, idPar = q1.IDpar })
+                    .Where(u => u.IDst == u.Lang & u.IDst != this.ID & u.IDpar != u.idPar);
+
+                // Заполнение листа родителями
+                foreach (var p in selectedParents)
                 {
-                    listparents.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO });
+                    listparents.Add(new Parent { ID = p.IDpar, Phone = p.Phone, Deldate = p.Deldate, Editdate = p.Editdate, FIO = p.FIO });
                 }
-                return listparents;
             }
+            return listparents;
         }
     }
 
@@ -249,7 +262,7 @@ namespace Test
         //}
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех учеников //////////////////
-        public static List<Student> FindAll(Boolean deldate, Parent parent, Student student, Contract contracnt, Course course, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Student> FindAll(Boolean deldate, Parent parent, Student student, Contract contracnt, Course course, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Student> stList = new List<Student>();
 
@@ -384,7 +397,7 @@ namespace Test
                     query2 = Utilit.OrderByDynamic(query2, sort, asсdesс);
                 }
 
-                int countrecord = query2.Count();
+                countrecord = query2.Count();
 
                 //int countrecord = query2.GroupBy(u => u.ID).Count();
 

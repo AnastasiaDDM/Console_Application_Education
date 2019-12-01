@@ -52,11 +52,12 @@ namespace Test
             /////////////////////// ОБЪЯВЛЕНИЕ ОБЩИХ ПЕРЕМЕННЫХ - ДЛЯ УДОБСТВА ПРОВЕРКИ РАБОТЫ ПОИСКОВ ////////////////////////
 
             Boolean deldate = true; // true - неудален false - все!!!
-            int count = 10;
+            int count = 2;
             int page = 1;
             String sort = "ID";
             String asсdesс = "asc";
 
+            /////////////////////////////////////////////// Получение ID последней добавленной записи ///////////////////////////////
             //SampleContext db = new SampleContext();
             //Grade gr = new Grade();
             //gr.StudentID = 3;
@@ -69,12 +70,83 @@ namespace Test
             //db.SaveChanges();
             //Console.WriteLine(gr.ID); //returned 1
 
+    /////////////////////////////////////////////////////////Пример решения проблемы с поиском возможных родителей!!!!!!!! /////////////////////////////////////////////////
+////            Student s111 = new Student();
+////            s111 = Students.StudentID(10);
+
+//////            List<Parent> par = GetPossibleparents();
+
+
+
+
+////            List<Parent> listparents = new List<Parent>();
+////            using (SampleContext db = new SampleContext())
+////            {
+////                var query = from p in db.Parents
+////                            join sp in db.StudentsParents on p.ID equals sp.ParentID
+////                            select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, PEditDate = p.Editdate, ParID = sp.ParentID, StID = sp.StudentID };
+
+////                var query1 = query.Where(x => x.StID == s111.ID);
+
+
+////                //List<int> selectedUsers = query.SelectMany(u => query1,
+////                //            (u, l) => new { IDpar = u.PID, Lang = l.PID, IDst = u.StID })
+////                //          .Where(u => u.IDpar == u.Lang)
+////                //          .Select(u => u.IDpar & u.IDst).ToList();
+
+
+////                var selectedStudent = query.SelectMany(u => query1,
+////                            (u, q1) => new { IDpar = u.PID, Lang = q1.PID, IDst = u.StID })
+////                          .Where(u => u.IDpar == u.Lang & u.IDst != s111.ID);
+
+
+////                var selectedParents = query.SelectMany(u => selectedStudent,
+////            (u, q1) => new { IDpar = u.PID, FIO = u.PFIO, Phone = u.PPhone, Deldate = u.PDelDate, Editdate = u.PEditDate, IDst = u.StID, Lang = q1.IDst, idPar = q1.IDpar })
+////          .Where(u => u.IDst == u.Lang & u.IDst != s111.ID & u.IDpar != u.idPar);
+
+////                //.Select(u => u.IDpar, u.FIO, u.Phone)
+
+////                foreach (var p in selectedParents)
+////                {
+////                    listparents.Add(new Parent { ID = p.IDpar, Phone = p.Phone, Deldate = p.Deldate, Editdate = p.Editdate, FIO = p.FIO });
+////                }
+
+////                //        IEnumerable<List<String>> zip = query.SelectMany(q => query1, (q, q1) => /*new int { q.PID, q.PFIO } && */ q.PID == q1.PID);
+
+
+////                //        .SelectMany(petOwner => petOwner.Pets, (petOwner, petName) => new { petOwner, petName })
+////                //.Where(ownerAndPet => ownerAndPet.petName.StartsWith("S"))
+
+////                //var query2 = query.Union(query1).Contains
+
+////                //var union = query1.Union(seq2)
+
+////                //parents = parents.Where(x => x.StID == this.ID);
+////                //parents = parents.Where(x => x.PID == x.ParID);
+
+////                foreach (var p in selectedStudent)
+////                {
+////                    Console.WriteLine(p);
+////                    //listparents.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO });
+////                }
+
+////                Console.WriteLine();
+
+////                foreach (var p in listparents)
+////                {
+////                    Console.WriteLine(p.ID + p.FIO);
+                    
+////                }
+////                //              return listparents;
+////            }
 
 
 
 
 
-        // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
+
+
+        ///////////////////////////// Пример №2 для того, чтобы разобраться с реализацией поиска свободных учителей!  //////////////////////////////////////////////////////////////////
 
         ////List<TimeRange> need = new List<TimeRange>();
 
@@ -142,7 +214,7 @@ namespace Test
         ////Environment.Exit(0);
 
 
-        // Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!
+        ///////////////////////////////////////////// Пример №1 для того, чтобы разобраться с реализацией поиска свободных учителей!  /////////////////////////////////////////////////////////////////
 
         ////    // --- time range 1 ---
         ////    TimeRange timeRange1 = new TimeRange(
@@ -280,15 +352,20 @@ namespace Test
      //               student.Phone = "1111111111";
                     Contract contract = new Contract();
                     Course course = new Course();
-     //               course.ID = 1;
+      //                             course.ID = 1;
+                    int countrecord = 0;
 
                     List<Student> stud = new List<Student>();
-                    stud = Students.FindAll(deldate, parent, student, contract, course, sort, asсdesс, page, count);
+                    stud = Students.FindAll(deldate, parent, student, contract, course, sort, asсdesс, page, count, ref countrecord);
+                    int pages =  Convert.ToInt32(Math.Ceiling(countrecord/count));
+
+
 
                     foreach (var s in stud)
                     {
                         Console.WriteLine("ID: {0} \t FIO: {1} \t Phone: {2} \t Deldate: {3} \t Editdate: {4}", s.ID, s.FIO, s.Phone, s.Deldate, s.Editdate);
                     }
+                    Console.WriteLine(countrecord);
                 }
 
                 if (choice == 2)
