@@ -110,7 +110,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все темы //////////////////
-        public static List<Theme> FindAll(Boolean deldate, Theme theme, Course course, DateTime mindate, DateTime maxdate, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Theme> FindAll(Boolean deldate, Theme theme, Course course, DateTime mindate, DateTime maxdate, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Theme> list = new List<Theme>();
             using (SampleContext db = new SampleContext())
@@ -156,7 +156,7 @@ namespace Test
                     query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
 
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

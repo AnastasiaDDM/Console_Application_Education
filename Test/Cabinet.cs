@@ -10,7 +10,7 @@ using System.Data.Entity;
 //+ add(): String DONE
 //+ del(): String DONE
 //+ edit(): String DONE
-//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable>
+//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable> DONE
 
 //+getFree(Start: Datetime, End: Datetime, Branch: Branch): List<Cabinet>
 
@@ -95,6 +95,19 @@ namespace Test
             return "Данные корректны!";
         }
 
+        public List<Timetable> getTimetables(DateTime date, bool deldate, int count, int page, string sort, string ascdesc, ref int countrecord)
+        {
+
+            Branch branch = new Branch();
+            Worker teacher = new Worker();
+
+            Student student = new Student();
+            Course course = new Course();
+
+            List<Timetable> timetables = new List<Timetable>();
+            return timetables = Timetables.FindAll(deldate, branch, this, teacher, course, student, date, sort, ascdesc, page, count, ref countrecord);
+        }
+
     }
 
     public static class Cabinets
@@ -111,7 +124,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все кабинеты //////////////////
-        public static List<Cabinet> FindAll(Boolean deldate, Cabinet cabinet, Branch branch, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Cabinet> FindAll(Boolean deldate, Cabinet cabinet, Branch branch, int min, int max, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Cabinet> list = new List<Cabinet>();
             using (SampleContext db = new SampleContext())
@@ -156,7 +169,7 @@ namespace Test
                 }
 
                 // Я перепроверила все варианты - это должно работать правильно!
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

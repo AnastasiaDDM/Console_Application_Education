@@ -52,93 +52,120 @@ namespace Test
             /////////////////////// ОБЪЯВЛЕНИЕ ОБЩИХ ПЕРЕМЕННЫХ - ДЛЯ УДОБСТВА ПРОВЕРКИ РАБОТЫ ПОИСКОВ ////////////////////////
 
             Boolean deldate = true; // true - неудален false - все!!!
-            int count = 2;
+            int count = 10;
             int page = 1;
             String sort = "ID";
             String asсdesс = "asc";
 
-            /////////////////////////////////////////////// Получение ID последней добавленной записи ///////////////////////////////
-            //SampleContext db = new SampleContext();
-            //Grade gr = new Grade();
-            //gr.StudentID = 3;
-            //gr.ThemeID = 1;
-            //gr.Mark = 5;
-            //db.Grades.Add(gr);
 
-            //Console.WriteLine(gr.ID); //returned 0
 
-            //db.SaveChanges();
-            //Console.WriteLine(gr.ID); //returned 1
 
-    /////////////////////////////////////////////////////////Пример решения проблемы с поиском возможных родителей!!!!!!!! /////////////////////////////////////////////////
-////            Student s111 = new Student();
-////            s111 = Students.StudentID(10);
+  //          ////////////////////////////////////////  Пример для поиска даты понедельника! для расписания /////////////////////////////////////////////////
 
-//////            List<Parent> par = GetPossibleparents();
+  //          DateTime date = DateTime.Now.AddDays(+7);
+
+  //          //   public static DateTime GetStartOfWeek(this DateTime dt)
+  //          //{
+  ////          DateTime ndt = dt.Subtract(TimeSpan.FromDays((int)dt.DayOfWeek));
+  //  //         DateTime first = new DateTime(ndt.Year, ndt.Month, ndt.Day+1, 0, 0, 0, 0);
 
 
 
 
-////            List<Parent> listparents = new List<Parent>();
-////            using (SampleContext db = new SampleContext())
-////            {
-////                var query = from p in db.Parents
-////                            join sp in db.StudentsParents on p.ID equals sp.ParentID
-////                            select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, PEditDate = p.Editdate, ParID = sp.ParentID, StID = sp.StudentID };
 
-////                var query1 = query.Where(x => x.StID == s111.ID);
+  //    //      var result = dt.AddDays(-((dt.DayOfWeek - System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek + 7) % 7)).Date;           // Самая правильная функция!
+  //          DateTime firstdate = date.AddDays(-((date.DayOfWeek - System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek + 7) % 7)).Date;
+  //          DateTime lastdate = firstdate.AddDays(+6);
 
-
-////                //List<int> selectedUsers = query.SelectMany(u => query1,
-////                //            (u, l) => new { IDpar = u.PID, Lang = l.PID, IDst = u.StID })
-////                //          .Where(u => u.IDpar == u.Lang)
-////                //          .Select(u => u.IDpar & u.IDst).ToList();
+  //  //        DateTime startAtMonday = dt.AddDays(DayOfWeek.Monday - DateTime.Now.DayOfWeek);
+  //          Console.WriteLine(firstdate + "     " + lastdate );
+  //      //}
 
 
-////                var selectedStudent = query.SelectMany(u => query1,
-////                            (u, q1) => new { IDpar = u.PID, Lang = q1.PID, IDst = u.StID })
-////                          .Where(u => u.IDpar == u.Lang & u.IDst != s111.ID);
 
 
-////                var selectedParents = query.SelectMany(u => selectedStudent,
-////            (u, q1) => new { IDpar = u.PID, FIO = u.PFIO, Phone = u.PPhone, Deldate = u.PDelDate, Editdate = u.PEditDate, IDst = u.StID, Lang = q1.IDst, idPar = q1.IDpar })
-////          .Where(u => u.IDst == u.Lang & u.IDst != s111.ID & u.IDpar != u.idPar);
+        /////////////////////////////////////////////// Получение ID последней добавленной записи ///////////////////////////////
+        //SampleContext db = new SampleContext();
+        //Grade gr = new Grade();
+        //gr.StudentID = 3;
+        //gr.ThemeID = 1;
+        //gr.Mark = 5;
+        //db.Grades.Add(gr);
 
-////                //.Select(u => u.IDpar, u.FIO, u.Phone)
+        //Console.WriteLine(gr.ID); //returned 0
 
-////                foreach (var p in selectedParents)
-////                {
-////                    listparents.Add(new Parent { ID = p.IDpar, Phone = p.Phone, Deldate = p.Deldate, Editdate = p.Editdate, FIO = p.FIO });
-////                }
+        //db.SaveChanges();
+        //Console.WriteLine(gr.ID); //returned 1
 
-////                //        IEnumerable<List<String>> zip = query.SelectMany(q => query1, (q, q1) => /*new int { q.PID, q.PFIO } && */ q.PID == q1.PID);
+        /////////////////////////////////////////////////////////Пример решения проблемы с поиском возможных родителей!!!!!!!! /////////////////////////////////////////////////
+        ////            Student s111 = new Student();
+        ////            s111 = Students.StudentID(10);
+
+        //////            List<Parent> par = GetPossibleparents();
 
 
-////                //        .SelectMany(petOwner => petOwner.Pets, (petOwner, petName) => new { petOwner, petName })
-////                //.Where(ownerAndPet => ownerAndPet.petName.StartsWith("S"))
 
-////                //var query2 = query.Union(query1).Contains
 
-////                //var union = query1.Union(seq2)
+        ////            List<Parent> listparents = new List<Parent>();
+        ////            using (SampleContext db = new SampleContext())
+        ////            {
+        ////                var query = from p in db.Parents
+        ////                            join sp in db.StudentsParents on p.ID equals sp.ParentID
+        ////                            select new { PID = p.ID, PPhone = p.Phone, PFIO = p.FIO, PDelDate = p.Deldate, PEditDate = p.Editdate, ParID = sp.ParentID, StID = sp.StudentID };
 
-////                //parents = parents.Where(x => x.StID == this.ID);
-////                //parents = parents.Where(x => x.PID == x.ParID);
+        ////                var query1 = query.Where(x => x.StID == s111.ID);
 
-////                foreach (var p in selectedStudent)
-////                {
-////                    Console.WriteLine(p);
-////                    //listparents.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO });
-////                }
 
-////                Console.WriteLine();
+        ////                //List<int> selectedUsers = query.SelectMany(u => query1,
+        ////                //            (u, l) => new { IDpar = u.PID, Lang = l.PID, IDst = u.StID })
+        ////                //          .Where(u => u.IDpar == u.Lang)
+        ////                //          .Select(u => u.IDpar & u.IDst).ToList();
 
-////                foreach (var p in listparents)
-////                {
-////                    Console.WriteLine(p.ID + p.FIO);
-                    
-////                }
-////                //              return listparents;
-////            }
+
+        ////                var selectedStudent = query.SelectMany(u => query1,
+        ////                            (u, q1) => new { IDpar = u.PID, Lang = q1.PID, IDst = u.StID })
+        ////                          .Where(u => u.IDpar == u.Lang & u.IDst != s111.ID);
+
+
+        ////                var selectedParents = query.SelectMany(u => selectedStudent,
+        ////            (u, q1) => new { IDpar = u.PID, FIO = u.PFIO, Phone = u.PPhone, Deldate = u.PDelDate, Editdate = u.PEditDate, IDst = u.StID, Lang = q1.IDst, idPar = q1.IDpar })
+        ////          .Where(u => u.IDst == u.Lang & u.IDst != s111.ID & u.IDpar != u.idPar);
+
+        ////                //.Select(u => u.IDpar, u.FIO, u.Phone)
+
+        ////                foreach (var p in selectedParents)
+        ////                {
+        ////                    listparents.Add(new Parent { ID = p.IDpar, Phone = p.Phone, Deldate = p.Deldate, Editdate = p.Editdate, FIO = p.FIO });
+        ////                }
+
+        ////                //        IEnumerable<List<String>> zip = query.SelectMany(q => query1, (q, q1) => /*new int { q.PID, q.PFIO } && */ q.PID == q1.PID);
+
+
+        ////                //        .SelectMany(petOwner => petOwner.Pets, (petOwner, petName) => new { petOwner, petName })
+        ////                //.Where(ownerAndPet => ownerAndPet.petName.StartsWith("S"))
+
+        ////                //var query2 = query.Union(query1).Contains
+
+        ////                //var union = query1.Union(seq2)
+
+        ////                //parents = parents.Where(x => x.StID == this.ID);
+        ////                //parents = parents.Where(x => x.PID == x.ParID);
+
+        ////                foreach (var p in selectedStudent)
+        ////                {
+        ////                    Console.WriteLine(p);
+        ////                    //listparents.Add(new Parent { ID = p.PID, Phone = p.PPhone, Deldate = p.PDelDate, FIO = p.PFIO });
+        ////                }
+
+        ////                Console.WriteLine();
+
+        ////                foreach (var p in listparents)
+        ////                {
+        ////                    Console.WriteLine(p.ID + p.FIO);
+
+        ////                }
+        ////                //              return listparents;
+        ////            }
 
 
 
@@ -321,7 +348,7 @@ namespace Test
 
 
         begin:;
-            Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 - ученики , 2 - родители, 3 - филиалы, 4 -договоры, 5 - работники, 6 - кабинеты, 7 - тип курса, 8 - курсы, 9 - оплаты, 10 - расписание, 11 - темы, 12 - оценки, 13 - посещаемость");
+            Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 - ученики , 2 - родители, 3 - филиалы, 4 -договоры, 5 - работники, 6 - кабинеты, 7 - тип курса, 8 - курсы, 9 - оплаты, 10 - расписание, 11 - темы, 12 - оценки, 13 - посещаемость, 14 - статистика");
             int ch = Convert.ToInt32(Console.ReadLine());
 
             if (ch == 1)                     ////////////////////////////////////////////////  УЧЕНИКИ ////////////////////////////////////////////////////////////////////////////
@@ -338,26 +365,29 @@ namespace Test
                 Console.WriteLine("9 - Добавление ученику ответственное лицо");
                 Console.WriteLine("10 - Удаление у ученика ответственного лица");
                 Console.WriteLine("11 - Список курсов этого ученика");
+                Console.WriteLine("12 - Расписание ученика");
+                Console.WriteLine("13 - Задолженность ученика по договору");
                 int choice = Convert.ToInt32(Console.ReadLine());
 
                 if (choice == 1)
                 {
                     Parent parent = new Parent();
 
-      //              parent.ID = 3;
+                    //              parent.ID = 3;
 
                     Student student = new Student();
 
-     //               student.FIO = "Анохин Александр";
-     //               student.Phone = "1111111111";
+                    //               student.FIO = "Анохин Александр";
+                    //               student.Phone = "1111111111";
                     Contract contract = new Contract();
                     Course course = new Course();
-      //                             course.ID = 1;
+                    //                             course.ID = 1;
                     int countrecord = 0;
 
                     List<Student> stud = new List<Student>();
                     stud = Students.FindAll(deldate, parent, student, contract, course, sort, asсdesс, page, count, ref countrecord);
-                    int pages =  Convert.ToInt32(Math.Ceiling(countrecord/count));
+
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
 
 
@@ -385,30 +415,30 @@ namespace Test
 
                 if (choice == 3)
                 {
-                        Console.WriteLine("Удаление ученика:");
-                        Console.WriteLine("Введите ID");
-                        int id = Convert.ToInt32(Console.ReadLine());
-                        Student s = new Student();
-                        s = Students.StudentID(id);
-                        string Answ = s.Del();
-                        Console.WriteLine(Answ);
+                    Console.WriteLine("Удаление ученика:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student s = new Student();
+                    s = Students.StudentID(id);
+                    string Answ = s.Del();
+                    Console.WriteLine(Answ);
                 }
 
                 if (choice == 4)
                 {
-                        Console.WriteLine("Редактирование ученика:");
-                        Console.WriteLine("Введите ID");
-                        int id = Convert.ToInt32(Console.ReadLine());
-                        Student v = new Student();
-                        v = Students.StudentID(id);
-                        Console.WriteLine("Введите ФИО");
-                        string fio = Console.ReadLine();
-                        Console.WriteLine("Введите номер телефона");
-                        string nom = Console.ReadLine();
-                        v.FIO = fio;
-                        v.Phone = nom;
-                        string Answer = v.Edit();
-                        Console.WriteLine(Answer);
+                    Console.WriteLine("Редактирование ученика:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student v = new Student();
+                    v = Students.StudentID(id);
+                    Console.WriteLine("Введите ФИО");
+                    string fio = Console.ReadLine();
+                    Console.WriteLine("Введите номер телефона");
+                    string nom = Console.ReadLine();
+                    v.FIO = fio;
+                    v.Phone = nom;
+                    string Answer = v.Edit();
+                    Console.WriteLine(Answer);
                 }
 
                 if (choice == 5)
@@ -450,15 +480,15 @@ namespace Test
                 }
 
                 if (choice == 8)     //Запрос ищет договоры по студенту                     + GetContracts() in Student
-                {   
-                        Console.WriteLine("Введите ID ученика");
-                        int id = Convert.ToInt32(Console.ReadLine());
-                        Student st = Students.StudentID(id);
-                        var v = st.GetContracts();
-                        foreach (var s in v)
-                        {
-                            Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate);
-                        }
+                {
+                    Console.WriteLine("Введите ID ученика");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student st = Students.StudentID(id);
+                    var v = st.GetContracts();
+                    foreach (var s in v)
+                    {
+                        Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate);
+                    }
                 }
 
                 if (choice == 9)    //Добавление отв. лица
@@ -510,10 +540,45 @@ namespace Test
                         Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4}  \t Start: {5} ", c.ID, c.nameGroup, c.Cost, c.TypeID, c.BranchID, c.Start);
                     }
                 }
+
+                if (choice == 12)
+                {
+                    Console.WriteLine("Получение расписания ученика:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student st = Students.StudentID(id);
+                    int countrecord = 0;
+                    DateTime date = DateTime.Now.AddDays(-10);
+
+                    List<Timetable> timetables = new List<Timetable>();
+                    timetables = st.getTimetables(date, deldate, count, page, sort, asсdesс, ref countrecord);
+                    //           int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
+
+                    foreach (var s in timetables)
+                    {
+                        Console.WriteLine("ID: {0} \t Deldate: {1}  \t CourseID: {2} \t  CabinetID: {3} \t Startlesson: {4} \t Endlesson: {5} ", s.ID, s.Deldate, s.CourseID, s.CabinetID, s.Startlesson, s.Endlesson);
+                    }
+                }
+
+                if (choice == 13)
+                {
+                    Console.WriteLine("Задолженность ученика по договору");
+                    Console.WriteLine("Введите ID ученика");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Student st = Students.StudentID(id);
+
+                    Console.WriteLine("Введите ID договора");
+                    int idc = Convert.ToInt32(Console.ReadLine());
+                    Contract c = Contracts.ContractID(idc);
+
+                     double debt = st.getDebt(c);
+                    Console.WriteLine(debt);
+
+                }
             }
 
 
-            if (ch == 2)                     ////////////////////////////////////////////////  РОДИТЕЛИ ////////////////////////////////////////////////////////////////////////////
+                if (ch == 2)                     ////////////////////////////////////////////////  РОДИТЕЛИ ////////////////////////////////////////////////////////////////////////////
             {
                 Console.WriteLine(" Что вы хотите сделать? Введите цифру от 1 до 6.");
                 Console.WriteLine("1 - Вывод всех отв. лица на экран");
@@ -539,9 +604,11 @@ namespace Test
                     //student.ID = 3 ;
                     //student.FIO = "Анохин Александр";
                     //student.Phone = "1111111111";
+                    int countrecord = 0;
 
                     List<Parent> parents = new List<Parent>();
-                    parents = Parents.FindAll(deldate, parent, student, sort, asсdesс, page, count);
+                    parents = Parents.FindAll(deldate, parent, student, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in parents)
                     {
@@ -681,9 +748,12 @@ namespace Test
                     Branch branch = new Branch();
       //                     branch.Address = "ул. Ленина, 6";
                     Worker director = new Worker();
-      //                        director.ID =4;
+                    //                        director.ID =4;
+                    int countrecord = 0;
+
                     List<Branch> branches = new List<Branch>();
-                    branches = Branches.FindAll(deldate, branch, director, sort, asсdesс, page, count);
+                    branches = Branches.FindAll(deldate, branch, director, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in branches)
                     {
@@ -824,8 +894,11 @@ namespace Test
                     DateTime maxdate = DateTime.MaxValue;
                     int min = 0;
                     int max = 0;
+                    int countrecord = 0;
+
                     List<Contract> contracts = new List<Contract>();
-                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, asсdesс, page, count);
+                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in contracts)
                     {
@@ -1013,7 +1086,8 @@ namespace Test
                 Console.WriteLine("3 - Удаление работника");
                 Console.WriteLine("4 - Редактирование данных о работнике");
                 Console.WriteLine("5 - Просмотр договоров, заключенных этим менеджером");
-                Console.WriteLine("6 - Просмотр отсортированного списка учеников по алфавиту");
+                Console.WriteLine("6 - Расписание преподавателя");
+                Console.WriteLine("7 - Оплата за занятие");
                 int choice5 = Convert.ToInt32(Console.ReadLine());
 
                 if (choice5 == 1)
@@ -1025,9 +1099,12 @@ namespace Test
                     Worker wor = new Worker();
                     //                    wor.Type = 1;             
                     //                   wor.Position = "Директор";
- //                   wor.FIO = "Газенкампф Галина";
+                    //                   wor.FIO = "Газенкампф Галина";
+                    int countrecord = 0;
+
                     List<Worker> workers = new List<Worker>();
-                    workers = Workers.FindAll(deldate, wor, branch, sort, asсdesс, page, count);
+                    workers = Workers.FindAll(deldate, wor, branch, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in workers)
                     {
@@ -1167,6 +1244,41 @@ namespace Test
                         Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate);
                     }
                 }
+
+                if (choice5 == 6)
+                {
+                    Console.WriteLine("Получение засписания преподавателя:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Worker w = Workers.WorkerID(id);
+                    int countrecord = 0;
+                    DateTime date = DateTime.Now.AddDays(-10);
+
+                    List<Timetable> timetables = new List<Timetable>();
+                    timetables = w.getTimetables(date, deldate, count, page, sort, asсdesс, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
+
+                    foreach (var s in timetables)
+                    {
+                        Console.WriteLine("ID: {0} \t Deldate: {1}  \t CourseID: {2} \t  CabinetID: {3} \t Startlesson: {4} \t Endlesson: {5} ", s.ID, s.Deldate, s.CourseID, s.CabinetID, s.Startlesson, s.Endlesson);
+                    }
+                }
+
+                if (choice5 == 7)
+                {
+                    Console.WriteLine("Оплата за занятие");
+                    Console.WriteLine("Введите ID преподавателя");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Worker st = Workers.WorkerID(id);
+
+                    Console.WriteLine("Введите ID элемента расписания");
+                    int idc = Convert.ToInt32(Console.ReadLine());
+                    Timetable c = Timetables.TimetableID(idc);
+
+                    double salary = st.Salary(c);
+                    Console.WriteLine(salary);
+
+                }
             }
 
             if (ch == 6)                     ////////////////////////////////////////////////  КАБИНЕТЫ ////////////////////////////////////////////////////////////////////////////
@@ -1176,6 +1288,7 @@ namespace Test
                 Console.WriteLine("2 - Добавление нового кабинета");
                 Console.WriteLine("3 - Удаление кабинета");
                 Console.WriteLine("4 - Редактирование данных о кабинете");
+                Console.WriteLine("5 - Расписание кабинета");
                 int choice6 = Convert.ToInt32(Console.ReadLine());
 
                 if (choice6 == 1)
@@ -1188,9 +1301,11 @@ namespace Test
                     //cab.Number = "Кабинет математики №1";
                     int min =0;
                     int max =0;
+                    int countrecord = 0;
 
                     List<Cabinet> cabinets = new List<Cabinet>();
-                    cabinets = Cabinets.FindAll(deldate, cab, branch, min, max, sort, asсdesс, page, count);
+                    cabinets = Cabinets.FindAll(deldate, cab, branch, min, max, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in cabinets)
                     {
@@ -1255,6 +1370,24 @@ namespace Test
                     string a = v.Edit();
                     Console.WriteLine(a);
                 }
+                if (choice6 == 5)
+                {
+                    Console.WriteLine("Получение расписания кабинета:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Cabinet cab = Cabinets.CabinetID(id);
+                    int countrecord = 0;
+                    DateTime date = DateTime.Now.AddDays(-10);
+
+                    List<Timetable> timetables = new List<Timetable>();
+                    timetables = cab.getTimetables(date, deldate, count, page, sort, asсdesс, ref countrecord);
+         //           int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
+
+                    foreach (var s in timetables)
+                    {
+                        Console.WriteLine("ID: {0} \t Deldate: {1}  \t CourseID: {2} \t  CabinetID: {3} \t Startlesson: {4} \t Endlesson: {5} ", s.ID, s.Deldate, s.CourseID, s.CabinetID, s.Startlesson, s.Endlesson);
+                    }
+                }
             }
 
             if (ch == 7)                     ////////////////////////////////////////////////  ТИП КУРСА ////////////////////////////////////////////////////////////////////////////
@@ -1277,10 +1410,11 @@ namespace Test
                     double maxCost = 0;
                     int minMonth = 0;
                     int maxMonth = 0;
-
+                    int countrecord = 0;
 
                     List<Type> stud = new List<Type>();
-                    stud = Types.FindAll(deldate, type, minLes, maxLes, minCost, maxCost, minMonth, maxMonth, sort, asсdesс, page, count);
+                    stud = Types.FindAll(deldate, type, minLes, maxLes, minCost, maxCost, minMonth, maxMonth, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in stud)
                     {
@@ -1417,6 +1551,7 @@ namespace Test
                 Console.WriteLine("6 - Список преподавателей этого курса");
                 Console.WriteLine("7 - Добавление преподавателя на курс");
                 Console.WriteLine("8 - Удаление преподавателя с курса");
+                Console.WriteLine("9 - Расписание курса");
 
                 int choice4 = Convert.ToInt32(Console.ReadLine());
 
@@ -1433,8 +1568,11 @@ namespace Test
                     DateTime maxdate = DateTime.MaxValue;
                     int min = 0;
                     int max = 0;
+                    int countrecord = 0;
+
                     List<Course> courses = new List<Course>();
-                    courses = Courses.FindAll(deldate, course, type, teacher, branch, mindate, maxdate, min, max, sort, asсdesс, page, count);
+                    courses = Courses.FindAll(deldate, course, type, teacher, branch, mindate, maxdate, min, max, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in courses)
                     {
@@ -1595,6 +1733,25 @@ namespace Test
                     string Answ = c.delTeacher(p);
                     Console.WriteLine(Answ);
                 }
+
+                if (choice4 == 9)
+                {
+                    Console.WriteLine("Получение расписания курса:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Course cour = Courses.CourseID(id);
+                    int countrecord = 0;
+                    DateTime date = DateTime.Now.AddDays(-10);
+
+                    List<Timetable> timetables = new List<Timetable>();
+                    timetables = cour.getTimetables(date, deldate, count, page, sort, asсdesс, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
+
+                    foreach (var s in timetables)
+                    {
+                        Console.WriteLine("ID: {0} \t Deldate: {1}  \t CourseID: {2} \t  CabinetID: {3} \t Startlesson: {4} \t Endlesson: {5} ", s.ID, s.Deldate, s.CourseID, s.CabinetID, s.Startlesson, s.Endlesson);
+                    }
+                }
             }
 
 
@@ -1617,7 +1774,7 @@ namespace Test
                 if (choice == 1)
                 {
                     Pay pay = new Pay();
-  //                  pay.Indicator = 2;
+                    pay.Indicator = 2;
                     Contract contract = new Contract();
                     Worker teacher = new Worker();
                     Timetable timetable = new Timetable();
@@ -1628,13 +1785,15 @@ namespace Test
                     DateTime maxdate = DateTime.MaxValue;
                     int min = 0;
                     int max = 0;
+                    int countrecord = 0;
 
                     List<Pay> stud = new List<Pay>();
-                    stud = Pays.FindAll(deldate, pay, contract, teacher, timetable, branch, mindate, maxdate, min, max, sort, asсdesс, page, count);
+                    stud = Pays.FindAll(deldate, pay, contract, teacher, timetable, branch, mindate, maxdate, min, max, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in stud)
                     {
-                        Console.WriteLine("ID: {0} \t Date: {1} \t Indicator: {2}  \t  Type: {3} \t Payment: {4} \t ContractID: {5} \t WorkerID: {6}", s.ID, s.Date, s.Indicator, s.Type, s.Payment, s.ContractID, s.WorkerID);
+                        Console.WriteLine("ID: {0} \t Date: {1} \t Indicator: {2}  \t  Type: {3} \t Payment: {4} \t ContractID: {5} \t WorkerID: {6}", s.ID, s.Date, s.Indicator, s.Type, - s.Payment, s.ContractID, s.WorkerID);
                     }
                 }
 
@@ -1693,7 +1852,7 @@ namespace Test
 
                     Console.WriteLine("Введите размер оплаты");
                     double payment = Convert.ToDouble(Console.ReadLine());
-                    p.Payment = payment;
+                    p.Payment = -payment;
 
                     Console.WriteLine("Введите тип оплаты");
                     string p2 = Console.ReadLine();
@@ -1726,7 +1885,7 @@ namespace Test
                     Console.WriteLine(Answ);
                 }
 
-                if (choice == 4) //////  НУЖНО ПОДУМАТЬ, А МОЖНО ЛИ ВООБЩЕ РЕДАКТИРОВАТЬ ОПЛАТУ?
+                if (choice == 4) //////  НУЖНО ПОДУМАТЬ, А МОЖНО ЛИ ВООБЩЕ РЕДАКТИРОВАТЬ ОПЛАТУ? нужно((
                 {
                     Console.WriteLine("Редактирование оплаты:");
                     Console.WriteLine("Введите ID");
@@ -1758,20 +1917,23 @@ namespace Test
                 {
                     Branch branch = new Branch();
                     //branch.ID = 1;
-                    Worker manager = new Worker();
+                    Worker teacher = new Worker();
                     //manager.ID = 5;
                     Student student = new Student();
                     Course course = new Course();
-                    DateTime mindate = DateTime.MinValue;
-                    DateTime maxdate = DateTime.MaxValue;
-                    int min = 0;
-                    int max = 0;
-                    List<Contract> contracts = new List<Contract>();
-                    contracts = Contracts.FindAll(deldate, student, manager, branch, course, mindate, maxdate, min, max, sort, asсdesс, page, count);
+                    Cabinet cabinet = new Cabinet();
+        //            cabinet.ID = 1;
+                    DateTime date = DateTime.Now.AddDays(-10);
 
-                    foreach (var s in contracts)
+                    int countrecord = 0;
+
+                    List<Timetable> timetables = new List<Timetable>();
+                    timetables = Timetables.FindAll(deldate, branch, cabinet, teacher, course, student, date, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
+
+                    foreach (var s in timetables)
                     {
-                        Console.WriteLine("ID: {0} \t Date: {1}  \t StudentID: {2} \t  Deldate: {3} \t Editdate: {4} \t ManagerID: {5} \t CourseID: {6}", s.ID, s.Date, s.StudentID, s.Deldate, s.Editdate, s.ManagerID, s.CourseID);
+                        Console.WriteLine("ID: {0} \t Deldate: {1}  \t CourseID: {2} \t  CabinetID: {3} \t Startlesson: {4} \t Endlesson: {5} ", s.ID, s.Deldate, s.CourseID, s.CabinetID, s.Startlesson, s.Endlesson);
                     }
                 }
 
@@ -1968,10 +2130,13 @@ namespace Test
  //                   theme.Tema = "Логарифмы";
 
                     Course course = new Course();
- //                   course.ID = 1;
+                    //                   course.ID = 1;
+
+                    int countrecord = 0;
 
                     List<Theme> themes = new List<Theme>();
-                    themes = Themes.FindAll(deldate, theme, course, mindate, maxdate, sort, asсdesс, page, count);
+                    themes = Themes.FindAll(deldate, theme, course, mindate, maxdate, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in themes)
                     {
@@ -2105,9 +2270,11 @@ namespace Test
 
                     int min = 0;
                     int max = 0;
+                    int countrecord = 0;
 
                     List<Grade> grades = new List<Grade>();
-                    grades = Grades.FindAll(deldate, grade, theme, course, stedent, mindate, maxdate, min, max, sort, asсdesс, page, count);
+                    grades = Grades.FindAll(deldate, grade, theme, course, stedent, mindate, maxdate, min, max, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
 
                     foreach (var s in grades)
                     {
@@ -2187,18 +2354,23 @@ namespace Test
                     /////////////////////// ВЫЗОВ ПОИСКА ПОСЕЩЕНИЙ   ////////////////////////
                     Branch branch1 = new Branch();
                     //           branch1.ID = 0;
-                    Cabinet cab = new Cabinet();
-                    //          cab.BranchID = 0;
-                    //          cab.Number = "Кабинет математики №1";
-                    int min = 0;
-                    int max = 0;
+                    Visit vis = new Visit();
 
-                    List<Cabinet> cabinets = new List<Cabinet>();
-                    cabinets = Cabinets.FindAll(deldate, cab, branch1, min, max, sort, asсdesс, page, count);
+                    Theme theme = new Theme();
+                    Course course = new Course();
+                    Student st = new Student();
+                    DateTime mindate = DateTime.MinValue;
+                    //                                 DateTime mindate = new DateTime(2019, 11, 27); // год - месяц - день
+                    DateTime maxdate = DateTime.MaxValue;
+                    int countrecord = 0;
 
-                    foreach (var s in cabinets)
+                    List<Visit> visits = new List<Visit>();
+                    visits = Visits.FindAll(deldate, vis, theme, course, st,  mindate, maxdate, sort, asсdesс, page, count, ref countrecord);
+                    int pages = Convert.ToInt32(Math.Ceiling((double)countrecord / count));
+
+                    foreach (var s in visits)
                     {
-                        Console.WriteLine("ID: {0} \t Number: {1}  \t Capacity: {2} \t  Deldate: {3} \t Editdate: {4} \t BranchID: {5}", s.ID, s.Number, s.Capacity, s.Deldate, s.Editdate, s.BranchID);
+                        Console.WriteLine("ID: {0} \t StudentID: {1}  \t TimetableID: {2} \t  Deldate: {3} \t Editdate: {4} \t Visit: {5}", s.ID, s.StudentID, s.TimetableID, s.Deldate, s.Editdate, s.Vis == 1 ? "присутствовал" : "отсутствовал");
                     }
                 }
 
@@ -2261,27 +2433,43 @@ namespace Test
                 }
             }
 
-            ////////////using (SampleContext db = new SampleContext())
-            ////////////{
+            if (ch == 14)                     ////////////////////////////////////////////////  СТАТИСТИКА ////////////////////////////////////////////////////////////////////////////
+            {
+                double profit;
+                double revenue;
 
-            ////////////    // вывод 
-            ////////////    foreach (Contract pl in db.Contracts.Include(p => p.Student))
-            ////////////        Console.WriteLine("{0} - {1}", pl.ID, pl.Student != null ? pl.Student.FIO : "");
-            ////////////    Console.WriteLine();
-            ////////////    foreach (Student t in db.Students.Include(t => t.Contracts))
-            ////////////    {
-            ////////////        Console.WriteLine("Ученик: {0} - {1}", t.ID, t.FIO);
-            ////////////        foreach (Contract pl in t.Contracts)
-            ////////////        {
-            ////////////            Console.WriteLine("{0} - {1}", pl.ID, pl.ManagerID);
-            ////////////        }
-            ////////////        Console.WriteLine();
-            ////////////    }
-            ////////////}
+                DateTime start = DateTime.MinValue;
+                //                                 DateTime mindate = new DateTime(2019, 11, 27); // год - месяц - день
+                DateTime end = DateTime.MaxValue;
+
+                Console.WriteLine("Введите ID филиала");
+                int id = Convert.ToInt32(Console.ReadLine());
+                Branch v = Branches.BranchID(id);
+                int countcontracts = v.Profit(start, end, out profit, out revenue);
+                Console.WriteLine(countcontracts + "   rev- " + revenue + "    prof- " + profit);
+            }
+
+                ////////////using (SampleContext db = new SampleContext())
+                ////////////{
+
+                ////////////    // вывод 
+                ////////////    foreach (Contract pl in db.Contracts.Include(p => p.Student))
+                ////////////        Console.WriteLine("{0} - {1}", pl.ID, pl.Student != null ? pl.Student.FIO : "");
+                ////////////    Console.WriteLine();
+                ////////////    foreach (Student t in db.Students.Include(t => t.Contracts))
+                ////////////    {
+                ////////////        Console.WriteLine("Ученик: {0} - {1}", t.ID, t.FIO);
+                ////////////        foreach (Contract pl in t.Contracts)
+                ////////////        {
+                ////////////            Console.WriteLine("{0} - {1}", pl.ID, pl.ManagerID);
+                ////////////        }
+                ////////////        Console.WriteLine();
+                ////////////    }
+                ////////////}
 
 
 
-            Console.WriteLine("Повторить? Введдите q.");
+                Console.WriteLine("Повторить? Введдите q.");
             string f = Console.ReadLine();
             if (f == "q")
             {

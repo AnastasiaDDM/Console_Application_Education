@@ -150,6 +150,27 @@ namespace Test
                 return v;
             }
         }
+
+        public int Profit(DateTime start, DateTime end, out double profit, out double revenue)
+        {
+            using (SampleContext db = new SampleContext())
+            {
+                var paysbr = db.Pays.Where(p => p.BranchID == this.ID & p.Date >= start & p.Date <= end)/* == null ? 0 : pays.Where(p => p.StudentID == this.ID)*/;
+                if (paysbr.Count() == 0)
+                {
+                    profit = 0;
+                    revenue = 0; 
+                }
+                else
+                {
+                    revenue = (paysbr.Where(p => p.ContractID != null).Sum(p => p.Payment));
+                    profit = revenue + (paysbr.Where(p => p.WorkerID != null).Sum(p => p.Payment)); // Сумма, потому что оплаты зп числятся с - (отрицательные). поэтому + на - равно -
+                }
+                int v = db.Contracts.Where(x => x.BranchID == this.ID).OrderBy(u => u.ID).Count();
+                return v;
+            }
+
+        }
     }
 
     public static class Branches
@@ -165,7 +186,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Branch> FindAll(Boolean deldate, Branch branch, Worker director, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Branch> FindAll(Boolean deldate, Branch branch, Worker director, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Branch> list = new List<Branch>();
             using (SampleContext db = new SampleContext())
@@ -203,7 +224,7 @@ namespace Test
                 }
 
                 // Я перепроверила все варианты - это должно работать правильно!
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

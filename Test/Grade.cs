@@ -101,7 +101,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все темы //////////////////
-        public static List<Grade> FindAll(Boolean deldate, Grade grade, Theme theme, Course course, Student student, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Grade> FindAll(Boolean deldate, Grade grade, Theme theme, Course course, Student student, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Grade> list = new List<Grade>();
             using (SampleContext db = new SampleContext())
@@ -201,7 +201,7 @@ namespace Test
 
 
                 // Я перепроверила все варианты - это должно работать правильно!
-                int countrecord = query2.GroupBy(u => u.ID).Count();
+                countrecord = query2.GroupBy(u => u.ID).Count();
 
                 query2 = query2.Skip((page - 1) * count).Take(count); // Формирование страниц и кол-во записей на странице
 

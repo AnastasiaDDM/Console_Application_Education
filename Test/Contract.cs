@@ -158,7 +158,7 @@ namespace Test
         //}
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все договоры //////////////////
-        public static List<Contract> FindAll(Boolean deldate, Student student, Worker manager, Branch branch, Course course, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Contract> FindAll(Boolean deldate, Student student, Worker manager, Branch branch, Course course, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Contract> list = new List<Contract>();
             using (SampleContext db = new SampleContext())
@@ -223,7 +223,7 @@ namespace Test
                 }
 
                 // Я перепроверила все варианты - это должно работать правильно!
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

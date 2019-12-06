@@ -13,8 +13,8 @@ using System.Data.Entity;
 //+ add(): String DONE
 //+ edit(): String DONE
 //+ getContracts(): List<Contract> DONE
-//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable>
-//+ Salary(Start: Datetime, End: Datetime, Rate: Double): Double
+//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable> DONE
+//+ Salary(Start: Datetime, End: Datetime, Rate: Double): Double DONE ( Мне кажется, что-то тут можно сделать лучше)
 
 namespace Test
 {
@@ -107,6 +107,51 @@ namespace Test
                 return v;
             }
         }
+
+        public List<Timetable> getTimetables(DateTime date, bool deldate, int count, int page, string sort, string ascdesc, ref int countrecord)
+        {
+            Branch branch = new Branch();
+            Course course = new Course();
+            Cabinet cabinet = new Cabinet();
+            Student student = new Student();
+
+            List<Timetable> timetables = new List<Timetable>();
+            return timetables = Timetables.FindAll(deldate, branch, cabinet, this, course, student, date, sort, ascdesc, page, count, ref countrecord);
+        }
+
+        public double Salary(Timetable timetable)
+        {
+            using (SampleContext db = new SampleContext())
+            {
+        //        var pays = db.Pays.Join(db.Contracts, // второй набор
+        //p => p.ContractID, // свойство-селектор объекта из первого набора
+        //c => c.ID, // свойство-селектор объекта из второго набора
+        //(p, c) => new // результат
+        //{
+        //    ID = p.ID,
+        //    ContractID = p.ContractID,
+        //    Date = p.Date,
+        //    BranchID = p.BranchID,
+        //    Payment = p.Payment,
+        //    Purpose = p.Purpose,
+        //    Type = p.Type,
+        //    Deldate = p.Deldate,
+        //    StudentID = c.StudentID
+        //});
+                //double sumPays = (pays.Where(p => p.StudentID == this.ID & p.ContractID == contract.ID)).Count() == 0 ? 0 : pays.Where(p => p.StudentID == this.ID & p.ContractID == contract.ID).Sum(p => p.Payment);
+
+                var paysst = db.Pays.Where(p => p.WorkerID == this.ID & p.TimetableID == timetable.ID)/* == null ? 0 : pays.Where(p => p.StudentID == this.ID)*/;
+                if (paysst.Count() == 0)
+                {
+                    return -1; /// Если у этого работника нет такого занятия!
+                }
+                else
+                {
+                    double sumPays = (paysst/*.Where(p => p.ContractID == contract.ID)*/.Sum(p => p.Payment));
+                    return Convert.ToDouble(this.Rate) + sumPays;
+                }
+            }
+        }
     }
 
     public static class Workers
@@ -131,7 +176,7 @@ namespace Test
 
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Worker> FindAll(Boolean deldate, Worker worker, Branch branch, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Worker> FindAll(Boolean deldate, Worker worker, Branch branch, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Worker> list = new List<Worker>();
             using (SampleContext db = new SampleContext())
@@ -190,7 +235,7 @@ namespace Test
                 //}
 
                 // Я перепроверила все варианты - это должно работать правильно!
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
 

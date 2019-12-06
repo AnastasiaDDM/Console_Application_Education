@@ -14,10 +14,11 @@ using System.Data.Entity;
 //+ getParents(): List<Parent> DONE
 //+ getContracts(): List<Contract> DONE
 //+ getCourses(Finished: Bolean): List<Course> DONE
-//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable> 
-//+ getDebt(Contract: Contract): Double
+//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable>  DONE
+//+ getDebt(Contract: Contract): Double DONE ( можно улучшить процесс, но работает корректно )
 //+ addParent() DONE - и возможных нужно тоже тут искать (пока не сделано)
-//+ delParent() DONE
+//+ delParent() DONE 
+//+ GetPossibleparents() DONE
 
 
 
@@ -236,6 +237,54 @@ namespace Test
             }
             return listparents;
         }
+
+        public List<Timetable> getTimetables(DateTime date, bool deldate, int count, int page, string sort, string ascdesc, ref int countrecord)
+        {
+
+            Branch branch = new Branch();
+
+            Worker teacher = new Worker();
+
+            Course course = new Course();
+            Cabinet cabinet = new Cabinet();
+
+            List<Timetable> timetables = new List<Timetable>();
+            return timetables = Timetables.FindAll(deldate, branch, cabinet, teacher, course, this, date, sort, ascdesc, page, count, ref countrecord);
+        }
+
+        public double getDebt(Contract contract)
+        {
+            using (SampleContext db = new SampleContext())
+            {
+                var pays = db.Pays.Join(db.Contracts, // второй набор
+        p => p.ContractID, // свойство-селектор объекта из первого набора
+        c => c.ID, // свойство-селектор объекта из второго набора
+        (p, c) => new // результат
+        {
+            ID = p.ID,
+            ContractID = p.ContractID,
+            Date = p.Date,
+            BranchID = p.BranchID,
+            Payment = p.Payment,
+            Purpose = p.Purpose,
+            Type = p.Type,
+            Deldate = p.Deldate,
+            StudentID = c.StudentID
+        });
+                //double sumPays = (pays.Where(p => p.StudentID == this.ID & p.ContractID == contract.ID)).Count() == 0 ? 0 : pays.Where(p => p.StudentID == this.ID & p.ContractID == contract.ID).Sum(p => p.Payment);
+
+                var paysst = pays.Where(p => p.StudentID == this.ID & p.ContractID == contract.ID)/* == null ? 0 : pays.Where(p => p.StudentID == this.ID)*/;
+                if (paysst.Count() == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    double sumPays = (paysst/*.Where(p => p.ContractID == contract.ID)*/.Sum(p => p.Payment));
+                    return contract.Cost - sumPays;
+                }
+            }
+        }
     }
 
     public static class Students
@@ -320,7 +369,7 @@ namespace Test
 
 
 
-                var query =   from s in db.Students
+                var query = from s in db.Students
                             join sp in db.StudentsParents on s.ID equals sp.StudentID
                             into std_prnt_temp
                             from std_prnt in std_prnt_temp.DefaultIfEmpty()
@@ -333,9 +382,9 @@ namespace Test
                             join scour in db.StudentsCourses on s.ID equals scour.StudentID
                             into std_cour_temp
                             from stcour in std_cour_temp.DefaultIfEmpty()
-                              //group new { s.ID, s.FIO, s.Phone } by s into percentGroup
-                              //orderby percentGroup.Key
-                select new  { ID = s.ID, Phone = s.Phone, FIO = s.FIO, Deldate = s.Deldate, Editdate = s.Editdate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
+                                //group new { s.ID, s.FIO, s.Phone } by s into percentGroup
+                                //orderby percentGroup.Key
+                            select new { ID = s.ID, Phone = s.Phone, FIO = s.FIO, Deldate = s.Deldate, Editdate = s.Editdate, PID = (prnt == null ? 0 : prnt.ID), CID = (cntr == null ? 0 : cntr.ID), CourseID = (stcour == null ? 0 : stcour.CourseID) };
 
                 //query = query.GroupBy(u => u.SID);
 
@@ -471,6 +520,5 @@ namespace Test
                 ////return stList;
             }
         }
-
-        }
+    }
 }

@@ -12,7 +12,7 @@ using System.Data.Entity;
 //+ edit(): String
 //+ getStudents(): List<Student> DONE
 //+ getTeachers(): List<Worker> DONE
-//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable>
+//+ getTimetable(Start: Datetime, End: Datetime): List<Timetable> DONE
 //+ addTeachers(Worker: Worker): String DONE
 //+ delTeachers(Worker: Worker): String DONE
 //+ addStudents(): String DONE
@@ -253,6 +253,21 @@ namespace Test
             }
             return answer;
         }
+
+        public List<Timetable> getTimetables(DateTime date, bool deldate, int count, int page, string sort, string ascdesc, ref int countrecord)
+        {
+
+            Branch branch = new Branch();
+
+            Worker teacher = new Worker();
+
+//            Course course = new Course();
+            Cabinet cabinet = new Cabinet();
+            Student student = new Student();
+
+            List<Timetable> timetables = new List<Timetable>();
+            return timetables = Timetables.FindAll(deldate, branch, cabinet, teacher, this, student, date, sort, ascdesc, page, count, ref countrecord);
+        }
     }
 
     public class Courses
@@ -267,7 +282,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все филиалы //////////////////
-        public static List<Course> FindAll(Boolean deldate, Course course, Type type, Worker teacher, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Course> FindAll(Boolean deldate, Course course, Type type, Worker teacher, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Course> list = new List<Course>();
             using (SampleContext db = new SampleContext())
@@ -349,7 +364,7 @@ namespace Test
                     query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
 
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

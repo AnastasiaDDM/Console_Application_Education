@@ -174,7 +174,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать всех родителей //////////////////
-        public static List<Parent> FindAll(Boolean deldate, Parent parent, Student student, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Parent> FindAll(Boolean deldate, Parent parent, Student student, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Parent> parentList = new List<Parent>();
 
@@ -234,7 +234,7 @@ namespace Test
                 }
 
 
-                int countrecord = query2.GroupBy(u => u.ID).Count();
+                countrecord = query2.GroupBy(u => u.ID).Count();
 
                 query2 = query2.Skip((page - 1) * count).Take(count); // Формирование страниц и кол-во записей на странице
 

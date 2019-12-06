@@ -113,7 +113,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все типы //////////////////
-        public static List<Type> FindAll(Boolean deldate, Type type, int minLes, int maxLes, double minCost, double maxCost, int minMonth, int maxMonth, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Type> FindAll(Boolean deldate, Type type, int minLes, int maxLes, double minCost, double maxCost, int minMonth, int maxMonth, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Type> list = new List<Type>();
             using (SampleContext db = new SampleContext())
@@ -169,7 +169,7 @@ namespace Test
                     query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
 
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

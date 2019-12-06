@@ -31,7 +31,7 @@ namespace Test
         public Nullable<int> TimetableID { get; set; }
         public Timetable Timetable { get; set; }
 
-        public Nullable<int> BranchID { get; set; }
+        public int BranchID { get; set; }
         public Branch Branch { get; set; }
 
         public Pay()
@@ -113,7 +113,7 @@ namespace Test
         }
 
         //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все оплаты //////////////////
-        public static List<Pay> FindAll(Boolean deldate, Pay pay, Contract contract, Worker teacher, Timetable timetable, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count) //deldate =false - все и удал и неудал!
+        public static List<Pay> FindAll(Boolean deldate, Pay pay, Contract contract, Worker teacher, Timetable timetable, Branch branch, DateTime mindate, DateTime maxdate, int min, int max, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
         {
             List<Pay> list = new List<Pay>();
             using (SampleContext db = new SampleContext())
@@ -189,7 +189,7 @@ namespace Test
                     query = Utilit.OrderByDynamic(query, sort, asсdesс);
                 }
 
-                int countrecord = query.GroupBy(u => u.ID).Count();
+                countrecord = query.GroupBy(u => u.ID).Count();
 
                 query = query.Skip((page - 1) * count).Take(count);
                 query = query.Distinct();

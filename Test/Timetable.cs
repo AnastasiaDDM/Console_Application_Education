@@ -12,7 +12,7 @@ using Itenso.TimePeriod;
 //+ addTeachers(): String DONE
 //+ delTeachers(): String DONE
 //+ GetFreeteachers(DateTime date) : List<Worker> 
-//+ findAll(Start: Datetime, End: Datetime, editDate:	DateTime, delDate:	DateTime, Course: Course, Cabinet: Cabinet, Teacher: Worker): List<Timetable> 
+//+ findAll(): List<Timetable> 
 
 namespace Test
 {
@@ -488,6 +488,103 @@ namespace Test
             }
         }
 
+        //////////////////// ОДИН БОЛЬШОЙ ПОИСК !!! Если не введены никакие параметры, функция должна возвращать все элементы расписания //////////////////
+        public static List<Timetable> FindAll(Boolean deldate, Branch branch, Cabinet cabinet, Worker teacher, Course course, Student student, DateTime date, String sort, String asсdesс, int page, int count, ref int countrecord) //deldate =false - все и удал и неудал!
+        {
+            List<Timetable> list = new List<Timetable>();
+            using (SampleContext db = new SampleContext())
+            {
+                var query = from c in db.Cabinets
+                            join t in db.Timetables on c.ID equals t.CabinetID
+                            join tt in db.TimetablesTeachers on t.ID equals tt.TimetableID
+                            join cour in db.Courses on t.CourseID equals cour.ID
+                            join sc in db.StudentsCourses on t.CourseID equals sc.CourseID
 
+                            select new { ID = t.ID, StudentID = sc.StudentID, CabinetID = t.CabinetID, CourseID = t.CourseID, Note = t.Note, Startlesson = t.Startlesson, Endlesson = t.Endlesson, Deldate = t.Deldate, Editdate = t.Editdate, BranchID = c.BranchID, TeacherID = tt.TeacherID };
+
+                // Последовательно просеиваем наш список 
+
+                if (deldate != false) // Убираем удаленных, если нужно
+                {
+                    query = query.Where(x => x.Deldate == null);
+                }
+
+                if (branch.ID != 0)
+                {
+                    query = query.Where(x => x.BranchID == branch.ID);
+                }
+
+                if (course.ID != 0)
+                {
+                    query = query.Where(x => x.CourseID == course.ID);
+                }
+
+                if (student.ID != 0)
+                {
+                    query = query.Where(x => x.StudentID == student.ID);
+                }
+
+                if (cabinet.ID != 0)
+                {
+                    query = query.Where(x => x.CabinetID == cabinet.ID);
+                }
+
+                if (teacher.ID != 0)
+                {
+                    query = query.Where(x => x.TeacherID == teacher.ID);
+                }
+
+    //            string format = "yyyy-MM-dd HH:mm:ss";
+                // Подсчет недели, которую необходимо отобразить!
+                DateTime firstdate = date.AddDays(-((date.DayOfWeek - System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek + 7) % 7)).Date;
+                DateTime lastdate = firstdate.AddDays(+6);
+
+                if (firstdate != DateTime.MinValue)
+                {
+                    query = query.Where(x => x.Startlesson >= firstdate);
+                }
+
+                if (lastdate != DateTime.MaxValue)
+                {
+                    query = query.Where(x => x.Endlesson <= lastdate);
+                }
+
+               //, StudentID = sc.StudentID, CabinetID = t.CabinetID, CourseID = t.CourseID, Note = t.Note, 
+               // Startlesson = t.Startlesson, Endlesson = t.Endlesson, Deldate = t.Deldate, Editdate = t.Editdate, BranchID = c.BranchID, TeacherID = tt.TeacherID
+                var query2 = query.GroupBy(t => new { t.ID, t.Startlesson, t.Endlesson, /*t.StudentID, */t.CabinetID, t.CourseID, t.Note, t.Deldate, t.Editdate }, (key, group) => new
+                {
+                    ID = key.ID,
+                    CourseID = key.CourseID,
+          //          StudentID = key.StudentID,
+                    CabinetID = key.CabinetID,
+                    Deldate = key.Deldate,
+                    Editdate = key.Editdate, 
+                    Note = key.Note, 
+                    Startlesson = key.Startlesson,
+                    Endlesson = key.Endlesson
+                });
+
+
+
+
+                //               query = query.Distinct();
+                if (sort != null)  // Сортировка, если нужно
+                {
+                    query2 = Utilit.OrderByDynamic(query2, sort, asсdesс);
+                }
+
+
+                countrecord = query2.GroupBy(u => u.ID).Count();
+
+                query2 = query2.Skip((page - 1) * count).Take(count);
+                query2 = query2.Distinct();
+
+                foreach (var p in query2)
+                {
+                    list.Add(new Timetable { ID = p.ID, CourseID = p.CourseID, CabinetID = p.CabinetID, Startlesson = p.Startlesson, Endlesson = p.Endlesson, Note = p.Note, Deldate = p.Deldate, Editdate = p.Editdate });
+                }
+                return list;
+            }
+        }
     }
 }
