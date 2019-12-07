@@ -59,7 +59,6 @@ namespace Test
 
 
 
-
   //          ////////////////////////////////////////  Пример для поиска даты понедельника! для расписания /////////////////////////////////////////////////
 
   //          DateTime date = DateTime.Now.AddDays(+7);
@@ -1289,6 +1288,7 @@ namespace Test
                 Console.WriteLine("3 - Удаление кабинета");
                 Console.WriteLine("4 - Редактирование данных о кабинете");
                 Console.WriteLine("5 - Расписание кабинета");
+                Console.WriteLine("6 - Поиск свободных кабинетов сейчас");
                 int choice6 = Convert.ToInt32(Console.ReadLine());
 
                 if (choice6 == 1)
@@ -1388,6 +1388,17 @@ namespace Test
                         Console.WriteLine("ID: {0} \t Deldate: {1}  \t CourseID: {2} \t  CabinetID: {3} \t Startlesson: {4} \t Endlesson: {5} ", s.ID, s.Deldate, s.CourseID, s.CabinetID, s.Startlesson, s.Endlesson);
                     }
                 }
+
+                if (choice6 == 6)
+                {
+                    List<Cabinet> cabinets = new List<Cabinet>();
+                    cabinets = Cabinets.getFree();
+
+                    foreach (var s in cabinets)
+                    {
+                        Console.WriteLine("ID: {0} \t Number: {1}  \t Capacity: {2} \t  Deldate: {3} \t Editdate: {4} \t BranchID: {5}", s.ID, s.Number, s.Capacity, s.Deldate, s.Editdate, s.BranchID);
+                    }
+                }
             }
 
             if (ch == 7)                     ////////////////////////////////////////////////  ТИП КУРСА ////////////////////////////////////////////////////////////////////////////
@@ -1398,6 +1409,7 @@ namespace Test
                 Console.WriteLine("3 - Удаление типа курса");
                 Console.WriteLine("4 - Редактирование данных о типе курса");
                 Console.WriteLine("5 - Спосок курсов с заданными типом курса");
+                Console.WriteLine("6 - Открытие шаблона");
 
                 int choice = Convert.ToInt32(Console.ReadLine());
 
@@ -1483,48 +1495,48 @@ namespace Test
 
                 if (choice == 4)
                 {
-                        Console.WriteLine("Редактирование типа курса:");
-                        Console.WriteLine("Введите ID");
-                        int id = Convert.ToInt32(Console.ReadLine());
-                        Type st = new Type();
-                        st = Types.TypeID(id);
-                        Console.WriteLine("Введите наименование типа курса");
-                        string name = Console.ReadLine();
-                        st.Name = name;
+                    Console.WriteLine("Редактирование типа курса:");
+                    Console.WriteLine("Введите ID");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Type st = new Type();
+                    st = Types.TypeID(id);
+                    Console.WriteLine("Введите наименование типа курса");
+                    string name = Console.ReadLine();
+                    st.Name = name;
 
-                        Console.WriteLine("Введите стоимость обучения по данному типу курса");
-                        string p1 = Console.ReadLine();
-                        if (p1 != "")
-                        {
-                            double cost = Convert.ToDouble(p1);
-                            st.Cost = cost;
-                        }
+                    Console.WriteLine("Введите стоимость обучения по данному типу курса");
+                    string p1 = Console.ReadLine();
+                    if (p1 != "")
+                    {
+                        double cost = Convert.ToDouble(p1);
+                        st.Cost = cost;
+                    }
 
-                        Console.WriteLine("Введите количество занятий");
-                        string p2 = Console.ReadLine();
-                        if (p2 != "")
-                        {
-                            int les = Convert.ToInt32(p2);
-                            st.Lessons = les;
-                        }
+                    Console.WriteLine("Введите количество занятий");
+                    string p2 = Console.ReadLine();
+                    if (p2 != "")
+                    {
+                        int les = Convert.ToInt32(p2);
+                        st.Lessons = les;
+                    }
 
-                        Console.WriteLine("Введите количество месяцев обучения");
-                        string p3 = Console.ReadLine();
-                        if (p3 != "")
-                        {
-                            int mon = Convert.ToInt32(p3);
-                            st.Month = mon;
-                        }
+                    Console.WriteLine("Введите количество месяцев обучения");
+                    string p3 = Console.ReadLine();
+                    if (p3 != "")
+                    {
+                        int mon = Convert.ToInt32(p3);
+                        st.Month = mon;
+                    }
 
-                        Console.WriteLine("Введите описание типа курса");
-                        string p4 = Console.ReadLine();
-                        if (p4 != "")
-                        {
-                            string note = p4;
-                            st.Note = note;
-                        }
-                        string Answer = st.Edit();
-                        Console.WriteLine(Answer);
+                    Console.WriteLine("Введите описание типа курса");
+                    string p4 = Console.ReadLine();
+                    if (p4 != "")
+                    {
+                        string note = p4;
+                        st.Note = note;
+                    }
+                    string Answer = st.Edit();
+                    Console.WriteLine(Answer);
                 }
 
                 if (choice == 5)     //Запрос ищет курсы           
@@ -1537,6 +1549,15 @@ namespace Test
                     {
                         Console.WriteLine("ID: {0} \t nameGroup: {1}  \t Cost: {2} \t  TypeID: {3} \t BranchID: {4}  \t Start: {5} ", c.ID, c.nameGroup, c.Cost, c.TypeID, c.BranchID, c.Start);
                     }
+                }
+
+                if (choice == 6)
+                {
+                    Console.WriteLine("Введите ID типа курса");
+                    int id = Convert.ToInt32(Console.ReadLine());
+                    Type st = Types.TypeID(id);
+
+                    st.openTemplate();
                 }
             }
 
@@ -2445,7 +2466,7 @@ namespace Test
                 Console.WriteLine("Введите ID филиала");
                 int id = Convert.ToInt32(Console.ReadLine());
                 Branch v = Branches.BranchID(id);
-                int countcontracts = v.Profit(start, end, out profit, out revenue);
+                int countcontracts = v.Statistic(start, end, out profit, out revenue);
                 Console.WriteLine(countcontracts + "   rev- " + revenue + "    prof- " + profit);
             }
 

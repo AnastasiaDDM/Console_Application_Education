@@ -16,7 +16,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 //+ getContracts(): List<Contract> DONE
 //+ getCourses(): List<Course> DONE
 //+ getCabinets(): List<Cabinet> DONE
-//+ profit(Start: Datetime, End: Datetime): Double
+//+ profit(Start: Datetime, End: Datetime): Double    DONE  Я сделала одну функцию, которая сразу считает выручку, прибыль и кол-во договоров  Statistic !
 //+ revenue(Start: Datetime, End: Datetime): Double
 
 namespace Test
@@ -151,7 +151,7 @@ namespace Test
             }
         }
 
-        public int Profit(DateTime start, DateTime end, out double profit, out double revenue)
+        public int Statistic(DateTime start, DateTime end, out double profit, out double revenue)
         {
             using (SampleContext db = new SampleContext())
             {
@@ -163,8 +163,9 @@ namespace Test
                 }
                 else
                 {
-                    revenue = (paysbr.Where(p => p.ContractID != null).Sum(p => p.Payment));
-                    profit = revenue + (paysbr.Where(p => p.WorkerID != null).Sum(p => p.Payment)); // Сумма, потому что оплаты зп числятся с - (отрицательные). поэтому + на - равно -
+                    revenue = ((paysbr.Where(p => p.ContractID != null).Count() == 0 ? 0 : paysbr.Where(p => p.ContractID != null).Sum(p => p.Payment)));
+                    profit = revenue + (paysbr.Where(p => p.WorkerID != null).Count() == 0 ? 0 : (paysbr.Where(p => p.WorkerID != null).Sum(p => p.Payment))); // Сумма, потому что оплаты зп числятся с - (отрицательные). поэтому + на - равно -
+                    //profit = revenue + (paysbr.Where(p => p.WorkerID != null).Sum(p => p.Payment)); // Сумма, потому что оплаты зп числятся с - (отрицательные). поэтому + на - равно -
                 }
                 int v = db.Contracts.Where(x => x.BranchID == this.ID).OrderBy(u => u.ID).Count();
                 return v;

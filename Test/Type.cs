@@ -4,6 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using System.Diagnostics;
+using Microsoft.Office.Interop.Word;
+using System.Reflection;
+
+
 
 //+ Type() DONE
 //+Type(ID: Int) DONE
@@ -11,8 +16,8 @@ using System.Data.Entity;
 //+ del(): String DONE
 //+ edit(): String DONE
 //+ getCourses():List<Course> DONE
-//+ openTemplate(): String
-//+ createTemplate(): String
+//+ openTemplate(): String DONE
+//+ createTemplate(): String   НЕ СДЕЛАНО!!!!!!!!!
 
 namespace Test
 {
@@ -97,6 +102,33 @@ namespace Test
                 var v = context.Courses.Where(x => x.TypeID == this.ID).OrderBy(u => u.ID).ToList<Course>();
                 return v;
             }
+        }
+
+        public void openTemplate()
+        {
+            var application = new Microsoft.Office.Interop.Word.Application();
+            var document = new Microsoft.Office.Interop.Word.Document();
+            document = application.Documents.Add(this.pathTemplate);
+            application.Visible = true;
+            document.SaveAs(@"C:\Users\79016\Desktop\ЛР5.docx");
+            //Process.Start(ref @"d:\Temp\Downloads\some.doc");
+        }
+
+        public void createTemplate()
+        {
+            //var application = new Microsoft.Office.Interop.Word.Application();
+            //var document = new Microsoft.Office.Interop.Word.Document();
+            //document = application.Documents.Add(@"C:\Users\79016\Desktop");
+            ////document = application.Documents.Creator
+            //application.Visible = true;
+            //document.SaveAs(@"C:\Users\79016\Desktop\22ЛР5.docx");
+            ////Process.Start(ref @"d:\Temp\Downloads\some.doc");
+
+            ////Создаем документ Word.
+            ////object missing = Type.Missing;
+            ////Word._Document word_doc = word_app.Documents.Add(
+            ////    ref missing, ref missing, ref missing, ref missing);
+
         }
     }
 
